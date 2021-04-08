@@ -16,13 +16,10 @@ To use the macro one needs to first have an **up to date version** of [FIJI](htt
 
 The ilastik thresholding option requires installing the [ilastik software package](https://www.ilastik.org/download.html).
 
-After installing the required plugins simply launch the plugin in FIJI by dragging and dropping the [Syn_Bot.ijm]() file into your FIJI window.
+After installing the required plugins, you can download the most recent release of this repository from the [releases page](https://github.com/Eroglu-Lab/Syn_Bot/releases). You can then simply launch the macro in FIJI by dragging and dropping the Syn_Bot.ijm file from the downloaded release into your FIJI window.
 You will then see the following settings menu.
 
 ![Settings Menu Image](https://github.com/savagedude3/Syn_Bot/blob/master/dialog_image.png)
-
-## Start-up wizard 
-This option begins a guided process to determine the necessary parameters for the macro, similar to the description below
 
 ## Start-up wizard
 This option begins a guided process to determine the necessary parameters for the macro, similar to the description below.
