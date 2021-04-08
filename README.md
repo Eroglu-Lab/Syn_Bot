@@ -1,7 +1,7 @@
 # Syn_Bot
 ## FIJI Syn_Bot Macro
 
-This macro was developed by Cagla Eroglu's Lab at Duke University to count the number of colocalized synaptic puncta in fluorescence microscopy images. The macro and related experimental methods are thoroughly described in our paper [insert link to paper].
+This macro was developed by Cagla Eroglu's Lab at Duke University to count the number of colocalized synaptic puncta in fluorescence microscopy images. The macro and related experimental methods are thoroughly described in our paper [insert link to paper]().
 
 Briefly, neuronal synapses contain specific proteins in the presynaptic terminal that differ from those found in the postsynaptic terminal. At a neuronal synapse these terminals are ~50nm apart and thus immunohistochemical staining of a protein from each compartment will give a colocalized signal due to the resolution limits of traditional fluorescence microscopy. 
 
@@ -16,7 +16,7 @@ To use the macro one needs to first have an **up to date version** of [FIJI](htt
 
 The ilastik thresholding option requires installing the [ilastik software package](https://www.ilastik.org/download.html).
 
-After installing the required plugins simply launch the plugin in FIJI by dragging and dropping the [Syn_Bot.ijm] file into your FIJI window.
+After installing the required plugins simply launch the plugin in FIJI by dragging and dropping the [Syn_Bot.ijm]() file into your FIJI window.
 You will then see the following settings menu.
 
 ![Settings Menu Image](https://github.com/savagedude3/Syn_Bot/blob/master/dialog_image.png)
