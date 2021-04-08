@@ -27,11 +27,11 @@ This option begins a guided process to determine the necessary parameters for th
 ## Analysis Type 
 This option allows the user to select either a circle-based or pixel-based process for calculating colocalizations. These options are described for the 2-channel case below.
 
-# Circle-based Colocalization Calculation
+### Circle-based Colocalization Calculation
 
 With this analysis mode selected, the coordinates and radius of each punctum for the channels to be analyzed are passed through the Syn_Bot_Helper java plugin (packaged within the ilastik4ij_Syn_Bot JAR file). A java plugin is used for this step because it can perform the necessary calculations much more efficiently than if they were done with ImageJ macro language. These values for each puncta in the first channel are then compared to each puncta in the second channel, calculating an area of colocalization using the geometry described by Robert Eisele https://www.xarg.org/2016/07/calculate-the-intersection-area-of-two-circles/. The basic idea of this method is to use the intersection points of the circles along with the center of each circle to define two triangles while also finding the areas of the sector of each circle between the two intersection points. Subtracting the area of each triangle from the area of its surrounding sector gives the half of the overlapping area contributed by that punctum. This can be done for both puncta to give the total area of the overlap. If this area is greater than 0, the coordinates and area of the overlap are stored and added to the colocalized puncta count. This method will work for any images with approximately circular puncta that can be any two sizes larger than the minimum pixel size used and do not have to have the same radius.
 
-# Pixel-based Colocalization Calculation
+### Pixel-based Colocalization Calculation
 
 Rather than approximating each punctum to a circle, this analysis mode uses the puncta found by Syn_Bot for each channel and compares them in a pixel-by-pixel fashion using the FIJI Image Calculator plugin’s AND function. This will create a new image where only those pixels that are part of a red punctum and a green punctum are marked. This new image can then be quantified by FIJI’s analyze particles plugin to get the same coordinate and area information collected by the circle-based method. The advantage of this method is that it does not require the puncta of interest to be circular and also runs much more quickly than the circle-based method, especially when applied to three channels.
 
