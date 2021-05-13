@@ -14,7 +14,7 @@ The primary components of analyzing these sorts of images include:
 
 To use the macro one needs to first have an **up to date version** of [FIJI](https://fiji.sc/) installed and then install the ilastik4ij_Syn_Bot plugin by moving the [ilastik4ij_Syn_Bot.jar] file from this repository into the "plugins" folder in FIJI (right-click the application and open package contents on Mac). You'll also need the [Bio-Formats Importer](https://imagej.net/Bio-Formats) if it is not already installed. Restart FIJI after plugin installation.
 
-The ilastik thresholding option requires installing the [ilastik software package](https://www.ilastik.org/download.html).
+The ilastik thresholding option requires installing the [ilastik software package](https://www.ilastik.org/download.html) and using it to train to ilastik project files (described in this [video](https://youtu.be/KY2lKaHMjcU)).
 
 After installing the required plugins, you can download the most recent release of this repository from the [releases page](https://github.com/Eroglu-Lab/Syn_Bot/releases). You can then simply launch the macro in FIJI by dragging and dropping the Syn_Bot.ijm file from the downloaded release into your FIJI window.
 You will then see the following settings menu.
@@ -38,7 +38,7 @@ Rather than approximating each punctum to a circle, this analysis mode uses the 
 
 ## Channels
 This section has two options: 2 Channel Colocalization (RG) and 3 Channel Colocalization (RGB). 2 Channel Colocalization is the original task of the Syn_Bot and will analyze the colocalizations between the red and green puncta of the input images. The 3 Channel Colocalization will preprocess the images (described below) the same as 2 Channel Colocalization, but will then either use a modified version of the circle-based method to calculate triple colocalizations or use an additional pixel-based step to calculate pixels that are part of both the red-green colocalizations and the blue channel.
-This section also has 3 numerical input boxes to add the minimum pixel area values for each channel. These are used by the built-in FIJI Analyze Particles function to count the puncta for each channel, excluding those puncta with an area less than the entered value. This value requires some experimentation, but we've found 4 pixels for in vivo and 8 pixels for in vitro to be a good starting point for the imaging set up described in our paper. For an explanation of how to adjust this value to your setup, see this [video](https://youtu.be/yCP1K0bAX5o).
+This section also has 3 numerical input boxes to add the minimum pixel area values for each channel. These are used by the built-in FIJI Analyze Particles function to count the puncta for each channel, excluding those puncta with an area less than the entered value. This value requires some experimentation, but we've found 4 pixels for in vivo and 8 pixels for in vitro to be a good starting point for the imaging set up described in our paper. For an explanation of how to adjust this value to your setup, see this [video](https://youtu.be/RBBxanwSTrA).
 
 ## Thresholding
 Thresholding is the process of distinguishing the foreground (synaptic puncta) of an image from the background. Synapse colocalization images tend to have a decent amount of noise as well as variability of the intensity of puncta within and between images. For these reasons, discriminating between true puncta and background in this context is not trivial and has led us to include as many methods as possible options the Syn_Bot user can utilize to overcome this problem. 
