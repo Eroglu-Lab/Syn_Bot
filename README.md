@@ -38,7 +38,7 @@ your files must follow the Experiment/Group/Image structure.
 ## Running SynBot
 Once the prerequisites are properly installed, Click and drag the Syn_Bot.ijm file into FIJI to open it in the FIJI script editor. Next, click the run button on the bottom left corner of the script editor to run the macro. You will then see the following selection menu.
 
-![Settings Menu Image](https://github.com/Eroglu-Lab/Syn_Bot/blob/main/syn_bot_menu_small.jpg)
+![Settings Menu Image](https://github.com/Eroglu-Lab/Syn_Bot/blob/main/syn_bot_menu_small.png)
 
 ## Channels 
 Select the appropriate number of channels to be analyzed (2 or 3). Images will be converted to the RedGreenBlue (RGB) format and the Red and Green channels will be analyzed for 2-Channel Colocalization and the Red, Green, and Blue channels will be analyzed for 3-Channel Colocalization. If necessary, image channels can be changed to fit these colors using the Pick Channels option.
