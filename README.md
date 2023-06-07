@@ -11,6 +11,7 @@ The primary components of analyzing these sorts of images include:
 3) counting of puncta in each channel
 4) calculating which puncta colocalize with puncta in the other channel
 
+##Installation
 
 To use the macro one needs to first have an **up to date version** of [FIJI](https://fiji.sc/) installed and then install the ilastik4ij_Syn_Bot plugin by moving the [ilastik4ij_Syn_Bot.jar] file from this repository into the "plugins" folder in FIJI (right-click the application and open package contents on Mac). You'll also need the [Bio-Formats Importer](https://imagej.net/Bio-Formats) if it is not already installed. Restart FIJI after plugin installation.
 
