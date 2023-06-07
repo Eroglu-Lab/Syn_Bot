@@ -3,7 +3,7 @@
 
 This macro was developed by [Cagla Eroglu's Lab at Duke University](https://sites.duke.edu/eroglulab/) to count the number of colocalized synaptic puncta in fluorescence microscopy images. The macro and related experimental methods are thoroughly described in our paper [insert link to paper]().
 
-There are also tutorials for using SynBot and relevant synaptic staining protocols on our Eroglu Lab protocols.io workspace.
+There are also tutorials for using SynBot and relevant synaptic staining protocols on our [Eroglu Lab protocols.io workspace](https://www.protocols.io/workspaces/eroglu_lab).
 
 Briefly, neuronal synapses contain specific proteins in the presynaptic terminal that differ from those found in the postsynaptic terminal. At a neuronal synapse these terminals are ~50nm apart and thus immunohistochemical staining of a protein from each compartment will give a colocalized signal due to the resolution limits of traditional fluorescence microscopy. 
 
