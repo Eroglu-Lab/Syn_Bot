@@ -1,0 +1,8 @@
+"0",""
+"0","veh_unmixed <- read.FCS(""TSA_experiment/Unmixed/tsa_20221221/vehicle.fcs"", truncate_max_range = FALSE)"
+"0","tsa_50_unmixed <- read.FCS(""TSA_experiment/Unmixed/tsa_20221221/50nM TSA.fcs"", truncate_max_range = FALSE)"
+"0","tsa_100_unmixed <- read.FCS(""TSA_experiment/Unmixed/tsa_20221221/100nM TSA.fcs"", truncate_max_range = FALSE)"
+"0","tsa_200_unmixed <- read.FCS(""TSA_experiment/Unmixed/tsa_20221221/200nM TSA.fcs"", truncate_max_range = FALSE)"
+"0",""
+"0","#auto plot everything 2D unmixed"
+"0","autoplot(veh_unmixed) + labs_cyto(""marker"")"

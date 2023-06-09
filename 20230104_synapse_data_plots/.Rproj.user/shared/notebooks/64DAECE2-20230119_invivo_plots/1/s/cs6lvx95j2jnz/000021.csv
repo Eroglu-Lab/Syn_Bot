@@ -1,0 +1,43 @@
+"0",""
+"0","puncta_analyzer_tukeys <- summary(glht(puncta_analyzer_lme, linfct=mcp(condition=""Tukey"")))"
+"0","puncta_analyzer_tukeys"
+"1","
+	"
+"1"," "
+"1","Simultaneous Tests for General Linear Hypotheses
+
+"
+"1","Multiple Comparisons of Means:"
+"1"," "
+"1","Tukey"
+"1"," "
+"1","Contrasts
+
+
+"
+"1","Fit: "
+"1","lme.formula(fixed = normalized_count ~ condition, data = puncta_analyzer_grouped)
+"
+"1","
+"
+"1","Linear Hypotheses:
+"
+"1","            "
+"1"," Estimate"
+"1"," Std. Error"
+"1"," z value"
+"1"," Pr(>|z|)"
+"1","
+KO - WT == 0"
+"1","  0.10906"
+"1","    0.07563"
+"1","   1.442"
+"1","    0.149"
+"1","
+"
+"1","(Adjusted p values reported -- single-step method)"
+"1","
+
+"
+"0","puncta_analyzer_tukeysPH <- data.frame(as.character(row.names(puncta_analyzer_tukeys$linfct)), puncta_analyzer_tukeys$test$pvalues)"
+"0",""

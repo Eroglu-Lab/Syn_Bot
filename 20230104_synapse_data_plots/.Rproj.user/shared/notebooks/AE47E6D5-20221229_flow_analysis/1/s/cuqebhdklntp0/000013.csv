@@ -1,0 +1,18 @@
+"0","#get the singlets for each sample as a flowset"
+"0","fs.singlets <- Subset(fs, g.singlets)"
+"0",""
+"0","veh.singlets <- fs.singlets[4]"
+"0","tsa_50.singlets <- fs.singlets[3]"
+"0","tsa_100.singlets <- fs.singlets[1]"
+"0","tsa_200.singlets <- fs.singlets[2]"
+"0",""
+"0","#add H3K27ac high gate"
+"0","g.H3K27ac_high <- rectangleGate(filterId = ""H3K27ac High"", ""Alexa 555-A""=c(2.15e5, 1e6))"
+"0",""
+"0","#check gate"
+"0","ggcyto(gs[[1]], aes(x = ""Alexa 555-A""), subset=""Singlets"") + geom_density(fill = ""black"") +"
+"0","  geom_gate(g.H3K27ac_high) + ggcyto_par_set(limits = ""instrument"") + scale_x_flowJo_biexp() "
+"2","[38;5;255mCoordinate system already present. Adding new coordinate system, which will replace the existing one.[39m"
+"2","Warning: 'scale_x_flowJo_biexp' is deprecated.
+Use 'scale_x_flowjo_biexp' instead.
+See help(""Deprecated"")"

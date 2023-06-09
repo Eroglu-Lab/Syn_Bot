@@ -1,0 +1,13 @@
+{
+    "sortOrder": [
+        {
+            "columnIndex": 4,
+            "ascending": false
+        },
+        {
+            "columnIndex": 2,
+            "ascending": true
+        }
+    ],
+    "path": "~/GitHub/Syn_Bot_private/20230104_synapse_data_plots"
+}

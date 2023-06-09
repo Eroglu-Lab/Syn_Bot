@@ -1,0 +1,17 @@
+"0","# add gate to GatingSet"
+"0","add(gs,g.singlets) "
+"2","Warning: 'add.default' is deprecated.
+Use 'gs_pop_add' instead.
+See help(""Deprecated"")"
+"1","[1]"
+"1"," 2"
+"1","
+"
+"0","# recompute GatingSet"
+"0","recompute(gs) "
+"2","done!
+"
+"0","#check how the gate looks for all the data"
+"0","ggcyto(gs,aes(x=""FSC-A"",y=""SSC-A""),subset=""root"")+geom_hex(bins = 100)+geom_gate(""Singlets"")+"
+"0","  geom_stats(adjust = 0.8)+ggcyto_par_set(limits = ""instrument"")"
+"2","[38;5;255mCoordinate system already present. Adding new coordinate system, which will replace the existing one.[39m"

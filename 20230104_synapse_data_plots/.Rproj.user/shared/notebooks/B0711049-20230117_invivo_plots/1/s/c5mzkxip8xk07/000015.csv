@@ -1,0 +1,6 @@
+"0",""
+"0","ggplot(summarize(group_by(ilastik_min8, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + "
+"0","  geom_col() +"
+"0","  geom_jitter(data = ilastik_min8, aes(x = condition, y = Colocalized.Puncta.Count)) +"
+"0","  labs(title = ""in vivo Synapses ilastik SynBot"")"
+"0",""

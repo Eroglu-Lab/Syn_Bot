@@ -1,0 +1,3 @@
+"0",""
+"0","gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Green.Puncta.Count))"
+"0","gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Green.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab(""VGLuT1 (Green) Puncta Count"")"

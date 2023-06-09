@@ -1,0 +1,43 @@
+"0",""
+"0","ilastik_tukeys <- summary(glht(ilastik_lme, linfct=mcp(condition=""Tukey"")))"
+"0","ilastik_tukeys"
+"1","
+	"
+"1"," "
+"1","Simultaneous Tests for General Linear Hypotheses
+
+"
+"1","Multiple Comparisons of Means:"
+"1"," "
+"1","Tukey"
+"1"," "
+"1","Contrasts
+
+
+"
+"1","Fit: "
+"1","lme.formula(fixed = Colocalized.Puncta.Count ~ condition, data = ilastik_grouped)
+"
+"1","
+"
+"1","Linear Hypotheses:
+"
+"1","            "
+"1"," Estimate"
+"1"," Std. Error"
+"1"," z value"
+"1"," Pr(>|z|)"
+"1","
+KO - WT == 0"
+"1","   -264.5"
+"1","      217.1"
+"1","  -1.219"
+"1","    0.223"
+"1","
+"
+"1","(Adjusted p values reported -- single-step method)"
+"1","
+
+"
+"0","ilastik_tukeysPH <- data.frame(as.character(row.names(ilastik_tukeys$linfct)), ilastik_tukeys$test$pvalues)"
+"0",""

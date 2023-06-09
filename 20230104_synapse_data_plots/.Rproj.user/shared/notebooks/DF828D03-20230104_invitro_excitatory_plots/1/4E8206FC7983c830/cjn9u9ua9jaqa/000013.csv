@@ -1,0 +1,8 @@
+"0",""
+"0","#ggsave(""invitro_excitatory_ilastik.pdf"", width = 3.5, height = 5)"
+"0",""
+"0","ggplot(summarize(group_by(puncta_analyzer_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + "
+"0","  geom_col(fill = NA, color = ""black"") +"
+"0","  geom_jitter(data = puncta_analyzer_data, aes(x = condition, y = Colocalized.Puncta.Count)) +"
+"0","  labs(title = ""in vitro Synapses Puncta Analyzer"", y = ""Colocalized Puncta per Image"")+"
+"0","  annotate(""text"", x = 1, y = 100, label = ""p<0.001"")"

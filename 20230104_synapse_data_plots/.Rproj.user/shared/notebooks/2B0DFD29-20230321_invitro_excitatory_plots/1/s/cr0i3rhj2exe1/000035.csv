@@ -1,0 +1,7 @@
+"0",""
+"0","#ggsave(""F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_4_in_vitro/invitro_excitatory_line_plot_raw.pdf"", width = 4.5, height = 2.75)"
+"0",""
+"0",""
+"0","gg.base <- ggplot(combined_data, aes(x = analysis_type, y = normalized_count))"
+"0","gg.idline <- gg.base + geom_line(aes(color = image_id, group = image_id, linetype = condition)) + geom_point(aes(color = image_id, group = image_id, shape = condition)) + scale_color_viridis_b()"
+"0","gg.idline"
