@@ -121,7 +121,8 @@ thresholding method and selecting the Summary.csv file from a previous run as th
 file. This will then rerun the analysis using the same thresholds, allowing the user to
 optimize any of the other analysis parameters.
 
-
+## Troubleshooting
+Please direct any bugs you encounter or requests for new features to the [Issues tab](https://github.com/Eroglu-Lab/Syn_Bot/issues) of this GitHub repository. You can also check the conversation about using SynBot at [protocols.io](https://www.protocols.io/view/synbot-protocols-3byl4qewjvo5/v1).
 
 
 
