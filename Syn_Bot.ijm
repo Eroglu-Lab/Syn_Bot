@@ -1,6 +1,6 @@
 /*  Syn_Bot
  *  Justin Savage
- *  5/8/23
+ *  6/27/23
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  
@@ -2518,7 +2518,7 @@ function correctChannels(dir1, dirOut, channelsList){
 			open(currentImage);
 		}
 		
-		else{
+		if ((endsWith(list[i], "tif") != 1) && (endsWith(list[i], "tiff") != 1)){
 		run("Bio-Formats Importer", "open=["+currentImage+"] color_mode=Composite rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
 		}
 	
