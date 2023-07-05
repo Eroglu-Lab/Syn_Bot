@@ -645,7 +645,13 @@ for(m = 0; m < listSource.length; m++){
 			//analyzePuncta(dirOut + currentImage, dirOut, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit, ilpRedDir, ilpGreenDir, ilpBlueDir);
 			analyzePuncta(dirOut + currentImage, dirOut, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, ilpRedDir, ilpGreenDir, ilpBlueDir);
 
-			
+			//TODO: get weird ilastik exception windows to close
+			//close any weird exception windows if they exist
+			if(isOpen("Exception")){
+				selectWindow("Exception");
+				close("Exception");
+			}
+		
 			//iterator is an iterator used to save the summary values
 			//to the correct location
 			iterator = iterator + 1;	
