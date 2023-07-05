@@ -1,6 +1,6 @@
 /*  Syn_Bot
  *  Justin Savage
- *  6/27/23
+ *  7/5/23
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  
