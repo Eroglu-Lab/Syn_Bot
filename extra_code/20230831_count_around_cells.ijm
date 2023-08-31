@@ -28,10 +28,13 @@ setBatchMode("false");
 
 list1 = getFileList(dirOut);
 
+print(list1.length);
+
 
 for (i = 0; i < list1.length; i++) {
 	//setBatchMode(true);
 	currentImage = list1[i];
+	print("Current Image is: " + currentImage);
 	open(dirOut + currentImage);
 	
 	//get the pixel size so that we will have it for converting later
@@ -77,8 +80,7 @@ for (i = 0; i < list1.length; i++) {
 	run("Dilate");
 	run("Dilate");
 	run("Dilate");
-	//TODO: add pixel-based mode to count synapses in each ROI
-	//add columns to the results window for each ROI (cell) that include the red, green, and coloc counts
+	
 	
 	saveAs("tif", dirOut + splitName[0] + "_mask1.tif");
 	
@@ -253,8 +255,8 @@ for (i = 0; i < list1.length; i++) {
 	open(roiPath);
 	
 		n = roiManager('count');
-	for (i = 0; i < n; i++) {
-    	roiManager('select', i);
+	for (j = 0; j < n; j++) {
+    	roiManager('select', j);
     	//counts synapses in each ROI and adds them to the Summary results table
     	run("Analyze Particles...", "size=0-Infinity pixel show=Overlay display exclude clear summarize");
 	}
@@ -275,8 +277,8 @@ for (i = 0; i < list1.length; i++) {
 	open(roiPath);
 	
 		n = roiManager('count');
-	for (i = 0; i < n; i++) {
-    	roiManager('select', i);
+	for (j = 0; j < n; j++) {
+    	roiManager('select', j);
     	//counts synapses in each ROI and adds them to the Summary results table
     	run("Analyze Particles...", "size=0-Infinity pixel show=Overlay display exclude clear summarize");
 	}
@@ -302,8 +304,8 @@ for (i = 0; i < list1.length; i++) {
 	open(roiPath);
 	
 		n = roiManager('count');
-	for (i = 0; i < n; i++) {
-    	roiManager('select', i);
+	for (j = 0; j < n; j++) {
+    	roiManager('select', j);
     	//counts synapses in each ROI and adds them to the Summary results table
     	run("Analyze Particles...", "size=0-Infinity pixel show=Overlay display exclude clear summarize");
 	}
@@ -317,6 +319,14 @@ for (i = 0; i < list1.length; i++) {
 	saveAs("Results", resultsPath);
 	
 	close("Summary");
+	
+	//close everything to clean up for the next image
+	print("finished image: " + currentImage + " i " + i);
+	close("*");
+	close("Threshold");
+	close("Results");
+	close("ROI Manager");
+	close(splitName[0] + "_results.csv");
 		
 }
 
@@ -373,18 +383,18 @@ function projectPair(dir1, dirOut) {
 	list  = getFileList(dir1);
 	setBatchMode(true);
 
-	for (i = 0; i < list.length; i++) {
-		print("i" + i + ":" + list[i]);
-		if(endsWith(list[i], ".ini")){
+	for (k = 0; k < list.length; k++) {
+		print("k" + k + ":" + list[k]);
+		if(endsWith(list[k], ".ini")){
 			continue;
 		}
-		if(endsWith(list[i], "/")){
+		if(endsWith(list[k], "/")){
 			continue;
 		}
-		if(endsWith(list[i], ".lif")){
+		if(endsWith(list[k], ".lif")){
 			continue;
 		}
-		zProject(dir1, dirOut, list[i]);
+		zProject(dir1, dirOut, list[k]);
 	}
 }
 
