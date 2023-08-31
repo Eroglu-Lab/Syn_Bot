@@ -266,7 +266,7 @@ for (i = 0; i < list1.length; i++) {
 	Table.setColumn("redPunctaCount", redCountArray);
 	saveAs("Results", resultsPath);
 	
-	run("Clear Results");
+	close("Summary");
 	
 	
 	//count green
@@ -293,7 +293,8 @@ for (i = 0; i < list1.length; i++) {
 	//Still need to find a way to clear the Summary table before saving
 	////////////////////
 	
-	run("Clear Results");
+	close("Summary");
+	
 	
 	//count colocs
 	open(colocPath);
@@ -315,7 +316,7 @@ for (i = 0; i < list1.length; i++) {
 	Table.setColumn("colocsPunctaCount", colocsCountArray);
 	saveAs("Results", resultsPath);
 	
-	run("Clear Results");
+	close("Summary");
 		
 }
 
