@@ -30,6 +30,8 @@ list1 = getFileList(dirOut);
 
 print(list1.length);
 
+dilateNum = getNumber("How many dilations?", 5);
+
 
 for (i = 0; i < list1.length; i++) {
 	//setBatchMode(true);
@@ -77,10 +79,16 @@ for (i = 0; i < list1.length; i++) {
 	
 	rename(splitName[0] + "_mask1.tif");
 	
-	run("Dilate");
-	run("Dilate");
-	run("Dilate");
+	//run dilate dilateNum times to make the cell ROI that many pixels larger
+	for (l = 0; l < dilateNum; l++) {
+		run("Dilate");
+	}
 	
+	roiManager("reset");
+	
+	run("Analyze Particles...", "size=" + blueMinPixel + "-Infinity pixel show=Overlay display exclude clear summarize add");
+	close("Summary");
+
 	
 	saveAs("tif", dirOut + splitName[0] + "_mask1.tif");
 	
