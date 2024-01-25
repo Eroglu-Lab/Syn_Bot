@@ -1,0 +1,402 @@
+---
+title: "20240116_invitro_excitatory_plots"
+output: html_document
+date: "2024-01-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load libraries}
+library(tidyverse)
+library(ggplot2)
+library(agricolae)
+library(ggsignif)
+library(multcomp)
+library(nlme)
+```
+
+
+```{r load data}
+
+puncta_analyzer_data <-read.csv("excitatory_invitro_data/excitatory_invitro_puncta_analyzer_lola_redo_circle.csv")
+manual_synbot_data <- read.csv("excitatory_invitro_data/excitatory_invitro_manual_lola.csv")
+ilastik_data <- read.csv("excitatory_invitro_data/excitatory_invitro_ilastik.csv")
+synquant_data <- read.csv("excitatory_invitro_data/excitatory_invitro_synquant.csv")
+
+#fix weird column names
+colnames(manual_synbot_data) <- colnames(ilastik_data)
+colnames(puncta_analyzer_data) <- colnames(ilastik_data)
+colnames(synquant_data) <- colnames(ilastik_data)
+
+#label data with the analysis type used
+puncta_analyzer_data$analysis_type <- "puncta_analyzer"
+manual_synbot_data$analysis_type <- "manual_synbot"
+ilastik_data$analysis_type <- "ilastik"
+synquant_data$analysis_type <- "synquant"
+
+#initialize condition 
+puncta_analyzer_data$condition <- "control"
+manual_synbot_data$condition <- "control"
+ilastik_data$condition <- "control"
+synquant_data$condition <- "control"
+
+#TODO: Make sure this is numbering correctly
+#add image_id
+puncta_analyzer_data$image_id <- seq.int(nrow(puncta_analyzer_data))
+manual_synbot_data$image_id <- seq.int(nrow(manual_synbot_data))
+ilastik_data$image_id <- seq.int(nrow(ilastik_data))
+synquant_data$image_id <- seq.int(nrow(synquant_data))
+
+#label data with experimental condition
+manual_synbot_data[which(grepl("Control", manual_synbot_data$Image)),]$condition <- "control"
+manual_synbot_data[which(grepl("ACM", manual_synbot_data$Image)),]$condition <- "ACM"
+
+#make condition a factor so that it always plots in control then ACM order
+manual_synbot_data$condition <- factor(manual_synbot_data$condition, levels = c("control", "ACM"))
+
+#make analysis_type a factor so that it always plots in puncta_analyzer, manual, ilastik order
+manual_synbot_data$analysis_type <- factor(manual_synbot_data$analysis_type, levels = c("puncta_analyzer", "manual_synbot", "ilastik", "synquant"))
+
+ilastik_data[which(grepl("Control", ilastik_data$Image)),]$condition <- "control"
+ilastik_data[which(grepl("ACM", ilastik_data$Image)),]$condition <- "ACM"
+
+ilastik_data$condition <- factor(ilastik_data$condition, levels = c("control", "ACM"))
+
+puncta_analyzer_data[which(grepl("Control", puncta_analyzer_data$Image)),]$condition <- "control"
+puncta_analyzer_data[which(grepl("ACM", puncta_analyzer_data$Image)),]$condition <- "ACM"
+
+puncta_analyzer_data$condition <- factor(puncta_analyzer_data$condition, levels = c("control", "ACM"))
+
+synquant_data[which(grepl("Control", synquant_data$Image)),]$condition <- "control"
+synquant_data[which(grepl("ACM", synquant_data$Image)),]$condition <- "ACM"
+
+synquant_data$condition <- factor(synquant_data$condition, levels = c("control", "ACM"))
+
+```
+
+
+```{r plot synapse counts}
+
+ggplot(summarize(group_by(manual_synbot_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") + 
+  geom_jitter(data = manual_synbot_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vitro Synapses Manual SynBot", y = "Colocalized Puncta per Image") +
+  annotate("text", x = 1, y = 90, label = "p=0.004")
+
+#ggsave("invitro_excitatory_manual.pdf", width = 3.5, height = 5)
+
+ggplot(summarize(group_by(ilastik_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = ilastik_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vitro Synapses Ilastik SynBot", y = "Colocalized Puncta per Image") +
+  annotate("text", x = 1, y = 200, label = "p=0.010")
+
+#ggsave("invitro_excitatory_ilastik.pdf", width = 3.5, height = 5)
+
+ggplot(summarize(group_by(puncta_analyzer_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = puncta_analyzer_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vitro Synapses Puncta Analyzer", y = "Colocalized Puncta per Image")+
+  annotate("text", x = 1, y = 100, label = "p<0.001")
+
+#ggsave("invitro_excitatory_puncta_analyzer.pdf", width = 3.5, height = 5)
+
+ggplot(summarize(group_by(synquant_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = synquant_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vitro Synapses synquant", y = "Colocalized Puncta per Image") +
+  annotate("text", x = 1, y = 200, label = "p=0.001")
+
+#ggsave("invitro_excitatory_synquant.pdf", width = 3.5, height = 5)
+
+```
+
+
+
+```{r stats}
+
+t.test(Colocalized.Puncta.Count ~ condition, manual_synbot_data)
+
+t.test(Colocalized.Puncta.Count ~ condition, ilastik_data)
+
+t.test(Colocalized.Puncta.Count ~ condition, puncta_analyzer_data)
+
+t.test(Colocalized.Puncta.Count ~ condition, synquant_data)
+
+```
+
+
+```{r normalize data}
+
+manual_raw_means <- summarize(group_by(manual_synbot_data, condition), mean(Colocalized.Puncta.Count))
+
+ilastik_raw_means <- summarize(group_by(ilastik_data, condition), mean(Colocalized.Puncta.Count))
+
+puncta_analyzer_means <- summarize(group_by(puncta_analyzer_data, condition), mean(Colocalized.Puncta.Count))
+
+synquant_raw_means <- summarize(group_by(synquant_data, condition), mean(Colocalized.Puncta.Count))
+
+#normalize count 
+manual_synbot_data$normalized_count <- 0
+
+manual_synbot_data$normalized_count <- manual_synbot_data$Colocalized.Puncta.Count/manual_raw_means$`mean(Colocalized.Puncta.Count)`[which(grepl("control", manual_raw_means$condition))]
+
+#calculate sem = sd/sqrt(n)
+manual_sem_control <- sd(manual_synbot_data$normalized_count[which(grepl("control", manual_synbot_data$condition))])/sqrt(length(manual_synbot_data$Image[which(grepl("control", manual_synbot_data$condition))]))
+
+manual_sem_acm <- sd(manual_synbot_data$normalized_count[which(grepl("ACM", manual_synbot_data$condition))])/sqrt(length(manual_synbot_data$Image[which(grepl("ACM", manual_synbot_data$condition))]))
+
+manual_synbot_data$sem <- 0
+manual_synbot_data$sem[which(grepl("control", manual_synbot_data$condition))] <- manual_sem_control
+manual_synbot_data$sem[which(grepl("ACM", manual_synbot_data$condition))] <- manual_sem_acm
+
+manual_synbot_data$mean_normalized_count <- 0
+manual_synbot_data$mean_normalized_count[which(grepl("control", manual_synbot_data$condition))] <- mean(manual_synbot_data$normalized_count[which(grepl("control", manual_synbot_data$condition))])
+manual_synbot_data$mean_normalized_count[which(grepl("ACM", manual_synbot_data$condition))] <- mean(manual_synbot_data$normalized_count[which(grepl("ACM", manual_synbot_data$condition))])
+
+
+#normalize count 
+ilastik_data$normalized_count <- 0
+
+ilastik_data$normalized_count <- ilastik_data$Colocalized.Puncta.Count/ilastik_raw_means$`mean(Colocalized.Puncta.Count)`[which(grepl("control", ilastik_raw_means$condition))]
+
+#calculate sem = sd/sqrt(n)
+ilastik_sem_control <- sd(ilastik_data$normalized_count[which(grepl("control", ilastik_data$condition))])/sqrt(length(ilastik_data$Image[which(grepl("control", ilastik_data$condition))]))
+
+ilastik_sem_acm <- sd(ilastik_data$normalized_count[which(grepl("ACM", ilastik_data$condition))])/sqrt(length(ilastik_data$Image[which(grepl("ACM", ilastik_data$condition))]))
+
+ilastik_data$sem <- 0
+ilastik_data$sem[which(grepl("control", ilastik_data$condition))] <- ilastik_sem_control
+ilastik_data$sem[which(grepl("ACM", ilastik_data$condition))] <- ilastik_sem_acm
+
+ilastik_data$mean_normalized_count <- 0
+ilastik_data$mean_normalized_count[which(grepl("control", ilastik_data$condition))] <- mean(ilastik_data$normalized_count[which(grepl("control", ilastik_data$condition))])
+ilastik_data$mean_normalized_count[which(grepl("ACM", ilastik_data$condition))] <- mean(ilastik_data$normalized_count[which(grepl("ACM", ilastik_data$condition))])
+
+
+#normalize count 
+puncta_analyzer_data$normalized_count <- 0
+
+puncta_analyzer_data$normalized_count <- puncta_analyzer_data$Colocalized.Puncta.Count/puncta_analyzer_means$`mean(Colocalized.Puncta.Count)`[which(grepl("control", puncta_analyzer_means$condition))]
+
+#calculate sem = sd/sqrt(n)
+puncta_analyzer_sem_control <- sd(puncta_analyzer_data$normalized_count[which(grepl("control", puncta_analyzer_data$condition))])/sqrt(length(puncta_analyzer_data$Image[which(grepl("control", puncta_analyzer_data$condition))]))
+
+puncta_analyzer_sem_acm <- sd(puncta_analyzer_data$normalized_count[which(grepl("ACM", puncta_analyzer_data$condition))])/sqrt(length(puncta_analyzer_data$Image[which(grepl("ACM", puncta_analyzer_data$condition))]))
+
+puncta_analyzer_data$sem <- 0
+puncta_analyzer_data$sem[which(grepl("control", puncta_analyzer_data$condition))] <- puncta_analyzer_sem_control
+puncta_analyzer_data$sem[which(grepl("ACM", puncta_analyzer_data$condition))] <- puncta_analyzer_sem_acm
+
+puncta_analyzer_data$mean_normalized_count <- 0
+puncta_analyzer_data$mean_normalized_count[which(grepl("control", puncta_analyzer_data$condition))] <- mean(puncta_analyzer_data$normalized_count[which(grepl("control", puncta_analyzer_data$condition))])
+puncta_analyzer_data$mean_normalized_count[which(grepl("ACM", puncta_analyzer_data$condition))] <- mean(puncta_analyzer_data$normalized_count[which(grepl("ACM", puncta_analyzer_data$condition))])
+
+
+#normalize count 
+synquant_data$normalized_count <- 0
+
+synquant_data$normalized_count <- synquant_data$Colocalized.Puncta.Count/synquant_raw_means$`mean(Colocalized.Puncta.Count)`[which(grepl("control", synquant_raw_means$condition))]
+
+#calculate sem = sd/sqrt(n)
+synquant_sem_control <- sd(synquant_data$normalized_count[which(grepl("control", synquant_data$condition))])/sqrt(length(synquant_data$Image[which(grepl("control", synquant_data$condition))]))
+
+synquant_sem_acm <- sd(synquant_data$normalized_count[which(grepl("ACM", synquant_data$condition))])/sqrt(length(synquant_data$Image[which(grepl("ACM", synquant_data$condition))]))
+
+synquant_data$sem <- 0
+synquant_data$sem[which(grepl("control", synquant_data$condition))] <- synquant_sem_control
+synquant_data$sem[which(grepl("ACM", synquant_data$condition))] <- synquant_sem_acm
+
+synquant_data$mean_normalized_count <- 0
+synquant_data$mean_normalized_count[which(grepl("control", synquant_data$condition))] <- mean(synquant_data$normalized_count[which(grepl("control", synquant_data$condition))])
+synquant_data$mean_normalized_count[which(grepl("ACM", synquant_data$condition))] <- mean(synquant_data$normalized_count[which(grepl("ACM", synquant_data$condition))])
+```
+
+
+```{r normalized stats}
+
+t.test(normalized_count ~ condition, manual_synbot_data)
+
+t.test(normalized_count ~ condition, ilastik_data)
+
+t.test(normalized_count ~ condition, puncta_analyzer_data)
+
+t.test(normalized_count ~ condition, synquant_data)
+
+```
+
+
+
+```{r normalized variance test}
+
+var.test(filter(manual_synbot_data, condition == "control")$normalized_count, filter(ilastik_data, condition == "control")$normalized_count)
+
+
+var.test(filter(manual_synbot_data, condition == "ACM")$normalized_count, filter(ilastik_data, condition == "ACM")$normalized_count)
+
+
+
+```
+
+
+```{r plot normalized synapse counts}
+
+manual_plot.df <- summarize(group_by(manual_synbot_data, condition), mean(normalized_count))
+manual_plot.df$sem <- 0
+manual_plot.df$sem[which(grepl("control", manual_plot.df$condition))] <- manual_sem_control
+manual_plot.df$sem[which(grepl("ACM", manual_plot.df$condition))] <- manual_sem_acm
+
+ggplot(manual_plot.df, aes(x = condition, y = `mean(normalized_count)`)) + 
+  geom_col(fill = NA, color = "black") + 
+  geom_jitter(data = manual_synbot_data, aes(x = condition, y = normalized_count)) +
+  labs(title = "in vitro Synapses Manual SynBot", y = "Colocalized Puncta per Image") +
+  annotate("text", x = 1, y = 3, label = "p=0.004") +
+  geom_errorbar(aes(ymin=`mean(normalized_count)`-sem, ymax=`mean(normalized_count)`+sem), width=.2,
+                 position=position_dodge(.9)) 
+
+#ggsave("invitro_excitatory_manual.pdf", width = 3.5, height = 5)
+
+ilastik_plot.df <- summarize(group_by(ilastik_data, condition), mean(normalized_count))
+ilastik_plot.df$sem <- 0
+ilastik_plot.df$sem[which(grepl("control", ilastik_plot.df$condition))] <- ilastik_sem_control
+ilastik_plot.df$sem[which(grepl("ACM", ilastik_plot.df$condition))] <- ilastik_sem_acm
+
+ggplot(ilastik_plot.df, aes(x = condition, y = `mean(normalized_count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = ilastik_data, aes(x = condition, y = normalized_count)) +
+  labs(title = "in vitro Synapses Ilastik SynBot", y = "Colocalized Puncta per Image") +
+  annotate("text", x = 1, y = 2.5, label = "p=0.010") +
+  geom_errorbar(aes(ymin=`mean(normalized_count)`-sem, ymax=`mean(normalized_count)`+sem), width=.2,
+                 position=position_dodge(.9)) 
+
+#ggsave("invitro_excitatory_ilastik.pdf", width = 3.5, height = 5)
+
+puncta_analyzer_plot.df <- summarize(group_by(puncta_analyzer_data, condition), mean(normalized_count))
+puncta_analyzer_plot.df$sem <- 0
+puncta_analyzer_plot.df$sem[which(grepl("control", puncta_analyzer_plot.df$condition))] <- puncta_analyzer_sem_control
+puncta_analyzer_plot.df$sem[which(grepl("ACM", puncta_analyzer_plot.df$condition))] <- puncta_analyzer_sem_acm
+
+ggplot(puncta_analyzer_plot.df, aes(x = condition, y = `mean(normalized_count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = puncta_analyzer_data, aes(x = condition, y = normalized_count)) +
+  labs(title = "in vitro Synapses Puncta Analyzer", y = "Colocalized Puncta per Image")+
+  annotate("text", x = 1, y = 4, label = "p<0.001") +
+  geom_errorbar(aes(ymin=`mean(normalized_count)`-sem, ymax=`mean(normalized_count)`+sem), width=.2,
+                 position=position_dodge(.9)) 
+
+#ggsave("invitro_excitatory_puncta_analyzer.pdf", width = 3.5, height = 5)
+
+synquant_plot.df <- summarize(group_by(synquant_data, condition), mean(normalized_count))
+synquant_plot.df$sem <- 0
+synquant_plot.df$sem[which(grepl("control", synquant_plot.df$condition))] <- synquant_sem_control
+synquant_plot.df$sem[which(grepl("ACM", synquant_plot.df$condition))] <- synquant_sem_acm
+
+ggplot(synquant_plot.df, aes(x = condition, y = `mean(normalized_count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = synquant_data, aes(x = condition, y = normalized_count)) +
+  labs(title = "in vitro Synapses synquant SynBot", y = "Colocalized Puncta per Image") +
+  annotate("text", x = 1, y = 2.5, label = "p=0.001") +
+  geom_errorbar(aes(ymin=`mean(normalized_count)`-sem, ymax=`mean(normalized_count)`+sem), width=.2,
+                 position=position_dodge(.9)) 
+
+#ggsave("invitro_excitatory_synquant.pdf", width = 3.5, height = 5)
+
+```
+
+```{r faceted plots}
+
+#combine data into one data frame
+
+combined_data <- rbind(manual_synbot_data, ilastik_data)
+
+combined_data <- rbind(combined_data, puncta_analyzer_data)
+
+combined_data <- rbind(combined_data, synquant_data)
+
+ggplot(data= combined_data, aes(x=condition, y=normalized_count)) + 
+  geom_bar(stat = "summary", fill = NA, color = "black") +
+  facet_grid(cols = vars(analysis_type)) +
+  geom_jitter(size = 0.5, width = 0.1, aes(color = condition)) +
+  geom_errorbar(aes(ymin=mean_normalized_count-sem, ymax=mean_normalized_count+sem), width=.2,
+                 position=position_dodge(.9), size = 0.25) +
+  labs(y = "Fold Change in synapse number \n (colocalization of bassoon and homer1)")+
+  theme(axis.text=element_text(size=8),
+        axis.title=element_text(size=10,face="bold")) +
+  scale_color_manual(values = c("black", "black")) + theme(legend.position = "none")
+
+#ggsave("F:/Savage_Dropbox/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20240116_figures/figure_4_in_vitro/invitro_excitatory_faceted_redo.pdf", width = 4.5, height = 2.75)
+
+```
+
+```{r simple lm }
+
+model_1 <- aov(normalized_count~analysis_type*condition, data = combined_data)
+summary(model_1)
+
+tukey_1 <- TukeyHSD(model_1)
+tukey_1
+```
+
+
+```{r compare analysis type for each image}
+
+combined_data_grouped <- nlme::groupedData(Colocalized.Puncta.Count ~ analysis_type | image_id, data = combined_data)
+
+combined_data_lme <- nlme::lme(combined_data_grouped)
+
+combined_data_lme
+summary(combined_data_lme)
+anova(combined_data_lme)
+
+```
+
+
+```{r repeated measures plot}
+
+gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Red.Puncta.Count))
+gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Red.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition)) + scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Homer1 (Red) Puncta Count")
+
+#ggsave("F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_s1_line_plots/invitro_excitatory_red_line_plot_raw.pdf", width = 5, height = 2.75)
+
+gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Green.Puncta.Count))
+gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Green.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Bassoon (Green) Puncta Count")
+
+#ggsave("F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_s1_line_plots/invitro_excitatory_green_line_plot_raw.pdf", width = 5, height = 2.75)
+
+gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Colocalized.Puncta.Count))
+gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Colocalized.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Colocalized Puncta Count")
+
+
+#ggsave("F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_s1_line_plots/invitro_excitatory_coloc_line_plot_raw.pdf", width = 5, height = 2.75)
+
+
+```
+
+
+
+
+```{r test for differences across analysis method}
+
+model_1 <- aov(normalized_count~analysis_type+condition, data = combined_data)
+summary(model_1)
+
+tukey_1 <- TukeyHSD(model_1)
+tukey_1
+
+combined_data_grouped <- nlme::groupedData(normalized_count ~ analysis_type | condition, data = combined_data)
+
+combined_data_lme <- nlme::lme(combined_data_grouped)
+
+combined_data_lme
+summary(combined_data_lme)
+anova(combined_data_lme)
+
+#TODO: can't get regular lme to run so that I can try to check for analysis_type X condition effects
+# model_2 <- nlme::lme(normalized_count ~ analysis_type, data = combined_data)
+# summary(model_2)
+
+```
+
+
