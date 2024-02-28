@@ -26,7 +26,15 @@ library(nlme)
 manual_synbot_data <- read.csv("a2d1_invivo_data/20230119_juan_manual_cleaned.csv")
 ilastik_data <- read.csv("a2d1_invivo_data/20230125_2_ilastik.csv")
 puncta_analyzer_data <- read.csv("a2d1_invivo_data/20230406_chris_puncta_analyzer_cleaned_v2.csv")
-synquant_data <- read.csv("a2d1_invivo_data/synquant_data_a2d1_combined.csv")
+synquant_data <- read.csv("a2d1_invivo_data/synquant_data_a2d1_combined_4.csv")
+#SynQuant params:
+# zscore_thres=10
+# MinSize=10
+# MaxSize=100
+# minFill=0.5
+# maxWHRatio=4
+# zAxisMultiplier=1
+# noiseStd=12
 
 
 #fix weird column names

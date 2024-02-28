@@ -1,5 +1,0 @@
-"0",""
-"0","ggplot(summarize(group_by(manual_synbot_data, condition), mean(normalized_count)), aes(x = condition, y = `mean(normalized_count)`)) + "
-"0","  geom_col() + "
-"0","  geom_jitter(data = manual_synbot_data, aes(x = condition, y = normalized_count)) +"
-"0","  labs(title = ""in vitro Synapses Manual SynBot"")"

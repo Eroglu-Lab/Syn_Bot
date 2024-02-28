@@ -1,3 +1,0 @@
-"0",""
-"0","gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Colocalized.Puncta.Count))"
-"0","gg.base + geom_line(aes(color = image_id, group = image_id, linetype = condition)) + geom_point(aes(color = image_id, group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Colocalized.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))"

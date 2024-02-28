@@ -1,8 +1,0 @@
-"0","knitr::opts_chunk$set(echo = TRUE)"
-"2","Warning message:
-"
-"2","In file.info(path, extra_cols = FALSE) :"
-"2","
- "
-"2"," cannot open file 'C:/Users/Justin/AppData/Local/Microsoft/WindowsApps/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/python.exe': The file cannot be accessed by the system
-"
