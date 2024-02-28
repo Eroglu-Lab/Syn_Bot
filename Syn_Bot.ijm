@@ -1,8 +1,12 @@
 /*  Syn_Bot
+ *   @authors
  *  Justin Savage
- *  7/5/23
+ *  Juan Ramirez
+ *  Yizhi Wang
+ *  1/25/24
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
+ *  SynQuant functionality depends on the SynQuantExtra plugin
  *  
  *  This macro is designed to analyze fluorescence microscopy images
  *  to determine the number of colocalizations between pre and postsynaptic
@@ -49,7 +53,7 @@ Dialog.create("Syn Bot");
 preprocessingList = newArray("Noise Reduction (Recommended)", "Brightness Adjustment (Use with caution)");
 channelList = newArray("2-Channel Colocalization (RG)", "3-Channel Colocalization (RGB)");
 threshTypes = newArray("Manual", "Fixed Value", "Percent Histogram", "FIJI auto",
-"ilastik", "Pre-Thresholded", "Threshold from File");
+"ilastik", "Pre-Thresholded", "Threshold from File", "SynQuant", "SynQuant batch");
 roiList = newArray("Whole Image", "Auto Cell Body", "Circle","Cell Territory" , "custom");
 analysisList = newArray("Circular-approximation", "Pixel-overlap");
 checkboxList = newArray("90-degree rotation control");
@@ -454,6 +458,47 @@ if (threshType == "FIJI auto"){
 	blueAutoConstant = Dialog.getNumber();
 }
 
+if(threshType == "SynQuant batch"){
+	//check for param.txt file
+	if(File.exists(dirSource + File.separator + "param.txt") == 1){
+		print("param.txt file found");
+	}
+	if(File.exists(dirSource + File.separator + "param.txt") == 0){
+		print("param.txt file not found");
+		//If no param.txt, ask for the parameters and write one
+		Dialog.create("Enter SynQuant Parameters");
+		Dialog.addNumber("Z score threshold", 10);
+		Dialog.addNumber("MinSize", 10);
+		Dialog.addNumber("MaxSize", 100);
+		Dialog.addNumber("minFill", 0.5);
+		Dialog.addNumber("max WH ratio", 4);
+		Dialog.addNumber("zAxisMultiplier", 1);
+		Dialog.addNumber("noiseStd", 20);
+		Dialog.show();
+		
+		synQuant_zscore_thres = Dialog.getNumber();
+		synQuant_minSize = Dialog.getNumber();
+		synQuant_maxSize = Dialog.getNumber();
+		synQuant_minFill = Dialog.getNumber();
+		synQuant_maxWHRatio = Dialog.getNumber();
+		synQuant_zAxisMultiplier = Dialog.getNumber();
+		synQuant_noiseStd = Dialog.getNumber();
+		
+		//creates param.txt since it doesn't exist
+		param_file = File.open(dirSource + File.separator + "param.txt");
+		print(param_file, "zscore_thres=" + synQuant_zscore_thres);
+		print(param_file, "MinSize=" + synQuant_minSize);
+		print(param_file, "MaxSize=" + synQuant_maxSize);
+		print(param_file, "minFill=" + synQuant_minFill);
+		print(param_file, "maxWHRatio=" + synQuant_maxWHRatio);
+		print(param_file, "zAxisMultiplier=" + synQuant_zAxisMultiplier);
+		print(param_file, "noiseStd=" + synQuant_noiseStd);
+		File.close(param_file);
+		
+	}
+	
+}
+
 ilastikDir = "";
 ilpRedDir = "";
 ilpGreenDir = "";
@@ -525,13 +570,11 @@ if (temp1 == true) {
 	offCenterBool = true;
 }
 
+
+
 //The following is the main chunk of the macro, which calls several
 //helper functions that are defined below it
 
-//Asks user for source directory (folder containing subfolder pairs)
-print("Choose Source Directory");
-//getting from the main menu now
-//dirSource  = getDirectory("Choose Source Directory ");
 listSource = getFileList(dirSource);
 
 startTime = getTime();
@@ -657,7 +700,6 @@ for(m = 0; m < listSource.length; m++){
 			iterator = iterator + 1;	
 		}
 	}
-}
 
 
 //Removes empty indices from arrays
@@ -733,7 +775,7 @@ print(((endTime - startTime)/1000.0) + " seconds");
 // function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType,imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit , ilpRedDir, ilpGreenDir, ilpBlueDir){
 function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, ilpRedDir, ilpGreenDir, ilpBlueDir){
 	//batch mode hides images and makes the macro run faster
-	setBatchMode(true);
+	setBatchMode(false);
 	
 	//print("in analyze puncta");
 
@@ -907,6 +949,32 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		if (analysisType == "Pixel-overlap"){
 			run("Convert to Mask");
 		}
+	}
+	
+	if (threshType == "SynQuant"){
+		setBatchMode(false);
+		run("SynQuantSimple");
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		redLower = 0;
+		redUpper = 0;
+	}
+	
+	if (threshType == "SynQuant batch"){
+		//run SynQuantBatch using the paramters from param.txt
+		run("SynQuantBatch", dirSource + File.separator + "param.txt");
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		redLower = 0;
+		redUpper = 0;
 	}
 
 	if (threshType == "ilastik"){
@@ -1237,6 +1305,32 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		if (analysisType == "Pixel-overlap"){
 			run("Convert to Mask");
 		}
+	}
+	
+	if (threshType == "SynQuant"){
+		setBatchMode(false);
+		run("SynQuantSimple");
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		greenLower = 0;
+		greenUpper = 0;
+	}
+	
+	if (threshType == "SynQuant batch"){
+		//run SynQuantBatch using the paramters from param.txt
+		run("SynQuantBatch", dirSource + File.separator + "param.txt");
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		greenLower = 0;
+		greenUpper = 0;
 	}
 
 	if (threshType == "ilastik"){
