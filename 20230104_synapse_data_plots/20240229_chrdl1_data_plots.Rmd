@@ -26,7 +26,7 @@ library(nlme)
 manual_synbot_data <- read.csv("chrdl1_ko_data/chrdl1_ko_manual.csv")
 ilastik_data <- read.csv("chrdl1_ko_data/chrdl1_ko_manual.csv")
 puncta_analyzer_data <- read.csv("chrdl1_ko_data/chrdl1_ko_manual.csv")
-synquant_data <- read.csv("chrdl1_ko_data/chrdl1_ko_synquant.csv")
+synquant_data <- read.csv("chrdl2_ko_synquant_5_12.csv")
 #SynQuant params:
 # zscore_thres=10
 # MinSize=10

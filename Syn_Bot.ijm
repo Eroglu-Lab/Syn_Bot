@@ -466,7 +466,7 @@ if(threshType == "SynQuant batch"){
 	if(File.exists(dirSource + File.separator + "param.txt") == 0){
 		print("param.txt file not found");
 		//If no param.txt, ask for the parameters and write one
-		Dialog.create("Enter SynQuant Parameters");
+		Dialog.create("Enter SynQuant Parameters for Red Channel");
 		Dialog.addNumber("Z score threshold", 10);
 		Dialog.addNumber("MinSize", 10);
 		Dialog.addNumber("MaxSize", 100);
@@ -485,7 +485,20 @@ if(threshType == "SynQuant batch"){
 		synQuant_noiseStd = Dialog.getNumber();
 		
 		//creates param.txt since it doesn't exist
-		param_file = File.open(dirSource + File.separator + "param.txt");
+		redParamPath = dirSource + File.separator + "paramRed.txt";
+		param_file = File.open(redParamPath);
+		print(param_file, "zscore_thres=" + synQuant_zscore_thres);
+		print(param_file, "MinSize=" + synQuant_minSize);
+		print(param_file, "MaxSize=" + synQuant_maxSize);
+		print(param_file, "minFill=" + synQuant_minFill);
+		print(param_file, "maxWHRatio=" + synQuant_maxWHRatio);
+		print(param_file, "zAxisMultiplier=" + synQuant_zAxisMultiplier);
+		print(param_file, "noiseStd=" + synQuant_noiseStd);
+		File.close(param_file);
+		
+		//creates param.txt since it doesn't exist
+		greenParamPath = dirSource + File.separator + "paramGreen.txt";
+		param_file = File.open(greenParamPath);
 		print(param_file, "zscore_thres=" + synQuant_zscore_thres);
 		print(param_file, "MinSize=" + synQuant_minSize);
 		print(param_file, "MaxSize=" + synQuant_maxSize);
@@ -966,7 +979,9 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	
 	if (threshType == "SynQuant batch"){
 		//run SynQuantBatch using the paramters from param.txt
-		run("SynQuantBatch", dirSource + File.separator + "param.txt");
+		currentParamPath = getDirectory("imagej") + File.separator + "param.txt";
+		File.copy(redParamPath, currentParamPath);
+		run("SynQuantBatch", currentParamPath);
 		selectWindow("Synapse mask");
 		rename("red_thresholded");
 		setThreshold(128, 512);
@@ -975,6 +990,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		}
 		redLower = 0;
 		redUpper = 0;
+		File.delete(currentParamPath);
 	}
 
 	if (threshType == "ilastik"){
@@ -1322,7 +1338,10 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	
 	if (threshType == "SynQuant batch"){
 		//run SynQuantBatch using the paramters from param.txt
-		run("SynQuantBatch", dirSource + File.separator + "param.txt");
+		//TODO: put currentParamPath in ImageJ dir so it can be deleted
+		currentParamPath = getDirectory("imagej") + File.separator + "param.txt";
+		File.copy(greenParamPath, currentParamPath);
+		run("SynQuantBatch", currentParamPath);
 		selectWindow("Synapse mask");
 		rename("red_thresholded");
 		setThreshold(128, 512);
@@ -1331,6 +1350,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		}
 		greenLower = 0;
 		greenUpper = 0;
+		File.delete(currentParamPath);
 	}
 
 	if (threshType == "ilastik"){
