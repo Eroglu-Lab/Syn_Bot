@@ -483,7 +483,7 @@ ggplot(data= combined_data, aes(x=condition, y=normalized_count)) +
   labs(y = "Fold change in synapse number \n (colocalization of VGluT1 and PSD95)") +
   scale_color_manual(values = c("black", "black")) + theme(legend.position = "none")
 
-#ggsave("F:/Savage_Dropbox/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20240116_figures/figure_5_in_vivo/invivo_a2d1_faceted.pdf", width = 6.5, height = 3.5)
+#ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_5_in_vivo/invivo_a2d1_faceted.pdf", width = 6.5, height = 3.5)
 
 ```
 

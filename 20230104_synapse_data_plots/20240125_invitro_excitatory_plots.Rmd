@@ -335,7 +335,7 @@ ggplot(data= combined_data, aes(x=condition, y=normalized_count)) +
         axis.title=element_text(size=10,face="bold")) +
   scale_color_manual(values = c("black", "black")) + theme(legend.position = "none")
 
-#ggsave("F:/Savage_Dropbox/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20240116_figures/figure_4_in_vitro/invitro_excitatory_faceted_redo.pdf", width = 4.5, height = 2.75)
+#ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_4_in_vitro/invitro_excitatory_faceted.pdf", width = 4.5, height = 2.75)
 
 ```
 
