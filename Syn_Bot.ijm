@@ -3,7 +3,7 @@
  *  Justin Savage
  *  Juan Ramirez
  *  Yizhi Wang
- *  2/29/24
+ *  3/4/24
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  SynQuant functionality depends on the SynQuantExtra plugin
@@ -285,27 +285,19 @@ if(threshType == "SynQuant batch"){
 	Dialog.addNumber("max WH ratio", 4);
 	Dialog.addNumber("zAxisMultiplier", 1);
 	Dialog.addNumber("noiseStd", 20);
+	Dialog.addCheckbox("Auto Detect noiseStd?", true);
 	Dialog.show();
 		
-	synQuant_zscore_thres = Dialog.getNumber();
-	synQuant_minSize = Dialog.getNumber();
-	synQuant_maxSize = Dialog.getNumber();
-	synQuant_minFill = Dialog.getNumber();
-	synQuant_maxWHRatio = Dialog.getNumber();
-	synQuant_zAxisMultiplier = Dialog.getNumber();
-	synQuant_noiseStd = Dialog.getNumber();
+	red_sq_zscore_thres = Dialog.getNumber();
+	red_sq_minSize = Dialog.getNumber();
+	red_sq_maxSize = Dialog.getNumber();
+	red_sq_minFill = Dialog.getNumber();
+	red_sq_maxWHRatio = Dialog.getNumber();
+	red_sq_zAxisMultiplier = Dialog.getNumber();
+	red_sq_noiseStd = Dialog.getNumber();
+	red_noiseEstBool = Dialog.getCheckbox();
 		
-	//creates param.txt since it doesn't exist
-	redParamPath = getDirectory("imagej") + File.separator + "paramRed.txt";
-	param_file = File.open(redParamPath);
-	print(param_file, "zscore_thres=" + synQuant_zscore_thres);
-	print(param_file, "MinSize=" + synQuant_minSize);
-	print(param_file, "MaxSize=" + synQuant_maxSize);
-	print(param_file, "minFill=" + synQuant_minFill);
-	print(param_file, "maxWHRatio=" + synQuant_maxWHRatio);
-	print(param_file, "zAxisMultiplier=" + synQuant_zAxisMultiplier);
-	print(param_file, "noiseStd=" + synQuant_noiseStd);
-	File.close(param_file);
+	
 	
 	Dialog.create("Enter SynQuant Parameters");
 	Dialog.addMessage("for Green Channel");
@@ -316,27 +308,17 @@ if(threshType == "SynQuant batch"){
 	Dialog.addNumber("max WH ratio", 4);
 	Dialog.addNumber("zAxisMultiplier", 1);
 	Dialog.addNumber("noiseStd", 20);
+	Dialog.addCheckbox("Auto Detect noiseStd?", true);
 	Dialog.show();
 		
-	synQuant_zscore_thres = Dialog.getNumber();
-	synQuant_minSize = Dialog.getNumber();
-	synQuant_maxSize = Dialog.getNumber();
-	synQuant_minFill = Dialog.getNumber();
-	synQuant_maxWHRatio = Dialog.getNumber();
-	synQuant_zAxisMultiplier = Dialog.getNumber();
-	synQuant_noiseStd = Dialog.getNumber();
-		
-	//creates param.txt since it doesn't exist
-	greenParamPath = getDirectory("imagej") + File.separator + "paramGreen.txt";
-	param_file = File.open(greenParamPath);
-	print(param_file, "zscore_thres=" + synQuant_zscore_thres);
-	print(param_file, "MinSize=" + synQuant_minSize);
-	print(param_file, "MaxSize=" + synQuant_maxSize);
-	print(param_file, "minFill=" + synQuant_minFill);
-	print(param_file, "maxWHRatio=" + synQuant_maxWHRatio);
-	print(param_file, "zAxisMultiplier=" + synQuant_zAxisMultiplier);
-	print(param_file, "noiseStd=" + synQuant_noiseStd);
-	File.close(param_file);
+	green_sq_zscore_thres = Dialog.getNumber();
+	green_sq_minSize = Dialog.getNumber();
+	green_sq_maxSize = Dialog.getNumber();
+	green_sq_minFill = Dialog.getNumber();
+	green_sq_maxWHRatio = Dialog.getNumber();
+	green_sq_zAxisMultiplier = Dialog.getNumber();
+	green_sq_noiseStd = Dialog.getNumber();
+	green_noiseEstBool = Dialog.getCheckbox();
 		
 }
 
@@ -807,8 +789,25 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	
 	if (threshType == "SynQuant batch"){
 		//run SynQuantBatch using the paramters from param.txt
-		currentParamPath = getDirectory("imagej") + File.separator + "param.txt";
-		File.copy(redParamPath, currentParamPath);
+		if(red_noiseEstBool == true){
+			//get noise estimation from image
+			run("Clear Results");
+			run("Measure");
+			red_sq_noiseStd = getResult("StdDev", 0);
+		}
+		
+		//creates param.txt for red channel
+		paramPath = getDirectory("imagej") + File.separator + "param.txt";
+		param_file = File.open(paramPath);
+		print(param_file, "zscore_thres=" + red_sq_zscore_thres);
+		print(param_file, "MinSize=" + red_sq_minSize);
+		print(param_file, "MaxSize=" + red_sq_maxSize);
+		print(param_file, "minFill=" + red_sq_minFill);
+		print(param_file, "maxWHRatio=" + red_sq_maxWHRatio);
+		print(param_file, "zAxisMultiplier=" + red_sq_zAxisMultiplier);
+		print(param_file, "noiseStd=" + red_sq_noiseStd);
+		File.close(param_file);
+		
 		run("SynQuantBatch", currentParamPath);
 		selectWindow("Synapse mask");
 		rename("red_thresholded");
@@ -818,7 +817,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		}
 		redLower = 0;
 		redUpper = 0;
-		File.delete(currentParamPath);
+		File.delete(paramPath);
 	}
 
 	if (threshType == "ilastik"){
@@ -1166,19 +1165,37 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	
 	if (threshType == "SynQuant batch"){
 		//run SynQuantBatch using the paramters from param.txt
-		//TODO: put currentParamPath in ImageJ dir so it can be deleted
-		currentParamPath = getDirectory("imagej") + File.separator + "param.txt";
-		File.copy(greenParamPath, currentParamPath);
+		
+		
+		if(green_noiseEstBool == true){
+			//get noise estimation from image
+			run("Clear Results");
+			run("Measure");
+			green_sq_noiseStd = getResult("StdDev", 0);
+		}
+		
+		//creates param.txt for green channel
+		paramPath = getDirectory("imagej") + File.separator + "param.txt";
+		param_file = File.open(paramPath);
+		print(param_file, "zscore_thres=" + green_sq_zscore_thres);
+		print(param_file, "MinSize=" + green_sq_minSize);
+		print(param_file, "MaxSize=" + green_sq_maxSize);
+		print(param_file, "minFill=" + green_sq_minFill);
+		print(param_file, "maxWHRatio=" + green_sq_maxWHRatio);
+		print(param_file, "zAxisMultiplier=" + green_sq_zAxisMultiplier);
+		print(param_file, "noiseStd=" + green_sq_noiseStd);
+		File.close(param_file);
+
 		run("SynQuantBatch", currentParamPath);
 		selectWindow("Synapse mask");
-		rename("red_thresholded");
+		rename("green_thresholded");
 		setThreshold(128, 512);
 		if (analysisType == "Pixel-overlap"){
 			run("Convert to Mask");
 		}
 		greenLower = 0;
 		greenUpper = 0;
-		File.delete(currentParamPath);
+		File.delete(paramPath);
 	}
 
 	if (threshType == "ilastik"){
