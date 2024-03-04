@@ -3,7 +3,7 @@
  *  Justin Savage
  *  Juan Ramirez
  *  Yizhi Wang
- *  1/25/24
+ *  2/29/24
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  SynQuant functionality depends on the SynQuantExtra plugin
@@ -296,7 +296,7 @@ if(threshType == "SynQuant batch"){
 	synQuant_noiseStd = Dialog.getNumber();
 		
 	//creates param.txt since it doesn't exist
-	redParamPath = dirSource + File.separator + "paramRed.txt";
+	redParamPath = getDirectory("imagej") + File.separator + "paramRed.txt";
 	param_file = File.open(redParamPath);
 	print(param_file, "zscore_thres=" + synQuant_zscore_thres);
 	print(param_file, "MinSize=" + synQuant_minSize);
@@ -327,7 +327,7 @@ if(threshType == "SynQuant batch"){
 	synQuant_noiseStd = Dialog.getNumber();
 		
 	//creates param.txt since it doesn't exist
-	greenParamPath = dirSource + File.separator + "paramGreen.txt";
+	greenParamPath = getDirectory("imagej") + File.separator + "paramGreen.txt";
 	param_file = File.open(greenParamPath);
 	print(param_file, "zscore_thres=" + synQuant_zscore_thres);
 	print(param_file, "MinSize=" + synQuant_minSize);

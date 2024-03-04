@@ -52,7 +52,7 @@ for (i = 0; i < rawList.length; i++) {
 	selectWindow(title + " (red)");
 	
 	setThreshold(redThreshValue, 255);
-	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display exclude clear summarize add");
+	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display clear summarize add");
 	
 	Stack.getDimensions(width, height, channels, slices, frames);
 	
@@ -82,7 +82,7 @@ for (i = 0; i < rawList.length; i++) {
 	selectWindow(title + " (green)");
 	
 	setThreshold(greenThreshValue, 255);
-	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display exclude clear summarize add");
+	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display clear summarize add");
 	
 	Stack.getDimensions(width, height, channels, slices, frames);
 	
@@ -109,7 +109,7 @@ for (i = 0; i < rawList.length; i++) {
 	open(currentRedThresh);
 	title = getTitle();
 	setThreshold(100, 255);
-	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display exclude clear summarize add");
+	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display clear summarize add");
 	
 	close("*");
 	
@@ -172,7 +172,7 @@ for (i = 0; i < rawList.length; i++) {
 	open(currentGreenThresh);
 	title = getTitle();
 	setThreshold(100, 255);
-	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display exclude clear summarize add");
+	run("Analyze Particles...", "size=" + 0 + "-" + "Infinity" + " pixel show=Overlay display clear summarize add");
 	
 	
 	close("*");
@@ -231,12 +231,16 @@ for (i = 0; i < rawList.length; i++) {
 	skipj = 0;
 	skipk = 0;
 	
+	//TODO: prevent pasting at the same place twice
+	
 	redBackgroundList = getFileList(dirRedBackground);
 	
 	open(dirRedBackground + File.separator + redBackgroundList[i]);
 	title = getTitle();
 	
 	redCount = 0;
+	
+	jList = newArray(10000);
 	
 	for (m = 0; m < redPunctaList.length; m++) {
 	
@@ -257,31 +261,43 @@ for (i = 0; i < rawList.length; i++) {
 		
 		getDimensions(width, height, channels, slices, frames);
 		
-		for (j = 0 + skipj; j < width; j = j + 100) {
+		//start loop at 20 so puncta aren't on the edge
+		for (j = 20 + skipj; j < width; j = j + 100) {
 			
 			//print(j);
 			
 			//break out of loop if puncta to paste would go beyond the bounds of the image
-			if(j + punctaWidth > width){
+			if(j + punctaWidth > width - 20){
 					break;
 				}
+				
+			//break if we already used this j for a different puncta
+			if(jList[j] == 1){
+				break;
+			}
 		
-			for (k = 0 + skipk; k < height; k = k + 50) {
+			for (k = 20 + skipk; k < height; k = k + 50) {
 				
 				//print(k);
 				
 				//break out of loop if puncta to paste would go beyond the bounds of the image
-				if(k + punctaHeight > height){
+				if(k + punctaHeight > height - 20){
 					break;
 				}
 				
+				//waitForUser("check paste");
 				Image.paste(j,k);
 				
 				redCount = redCount + 1;
 				
 			}
 		
+		//record which j was used
+		jList[j] = 1;
+		
 		}
+		
+		
 		
 		skipj = skipj + 20;
 		//skipk = skipk + 5;
@@ -312,6 +328,7 @@ for (i = 0; i < rawList.length; i++) {
 	title = getTitle();
 	
 	greenCount = 0;
+	jList = newArray(10000);
 	
 	for (m = 0; m < greenPunctaList.length; m++) {
 	
@@ -332,22 +349,27 @@ for (i = 0; i < rawList.length; i++) {
 		
 		getDimensions(width, height, channels, slices, frames);
 		
-		
-		for (j = 0 + skipj; j < width; j = j + 100) {
+		//start loop at 20 so puncta aren't on edge
+		for (j = 20 + skipj; j < width; j = j + 100) {
 			
 			//print(j);
 			
 			//break out of loop if puncta to paste would go beyond the bounds of the image
-			if(j + punctaWidth > width){
+			if(j + punctaWidth > width - 20){
 					break;
 				}
+				
+			//break if we already used this j for a different puncta
+			if(jList[j] == 1){
+				break;
+			}
 		
-			for (k = 0 + skipk; k < height; k = k + 50) {
+			for (k = 20 + skipk; k < height; k = k + 50) {
 				
 				//print(k);
 				
 				//break out of loop if puncta to paste would go beyond the bounds of the image
-				if(k + punctaHeight > height){
+				if(k + punctaHeight > height - 20){
 					break;
 				}
 				
@@ -355,6 +377,9 @@ for (i = 0; i < rawList.length; i++) {
 				greenCount = greenCount + 1;
 				
 			}
+			
+			//record which j was used
+			jList[j] = 1;
 		
 		}
 		
