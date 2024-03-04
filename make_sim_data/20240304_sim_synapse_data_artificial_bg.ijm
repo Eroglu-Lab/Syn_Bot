@@ -43,7 +43,8 @@ redThreshValue = 90;
 greenThreshValue = 90;
 
 //multiply noise by this to increase or decrease proportionally
-noiseMultiplier = 0.75;
+//adds more or less background, 0 gives black background
+noiseMultiplier = 0.25;
 
 for (i = 0; i < rawList.length; i++) {
 	
