@@ -1,6 +1,20 @@
 //generates simulated images by creating a background image of gaussian noise and 
 //then pasting on puncta from an image
 
+//multiply noise by this to increase or decrease proportionally
+//adds more or less background, 0 gives black background
+noiseMultiplier = 0.50;
+
+redMinPixel = 10;
+redMaxString = "Infinity"
+
+greenMinPixel = 10;
+greenMaxString = "Infinity"
+
+redThreshValue = 90;
+greenThreshValue = 90;
+
+
 //open image
 //split channgels
 //open red thresholded
@@ -33,18 +47,9 @@ File.makeDirectory(dirGreenBackground);
 dirOut = dir1 + File.separator + "output";
 File.makeDirectory(dirOut);
 
-redMinPixel = 10;
-redMaxString = "Infinity"
 
-greenMinPixel = 10;
-greenMaxString = "Infinity"
 
-redThreshValue = 90;
-greenThreshValue = 90;
 
-//multiply noise by this to increase or decrease proportionally
-//adds more or less background, 0 gives black background
-noiseMultiplier = 0.25;
 
 for (i = 0; i < rawList.length; i++) {
 	
@@ -235,8 +240,6 @@ for (i = 0; i < rawList.length; i++) {
 	skipj = 0;
 	skipk = 0;
 	
-	//TODO: prevent pasting at the same place twice
-	
 	redBackgroundList = getFileList(dirRedBackground);
 	
 	open(dirRedBackground + File.separator + redBackgroundList[i]);
@@ -271,7 +274,7 @@ for (i = 0; i < rawList.length; i++) {
 			//print(j);
 			
 			//break out of loop if puncta to paste would go beyond the bounds of the image
-			if(j + punctaWidth > width - 20){
+			if(j + punctaWidth > width - 10){
 					break;
 				}
 				
@@ -285,7 +288,7 @@ for (i = 0; i < rawList.length; i++) {
 				//print(k);
 				
 				//break out of loop if puncta to paste would go beyond the bounds of the image
-				if(k + punctaHeight > height - 20){
+				if(k + punctaHeight > height - 10){
 					break;
 				}
 				
@@ -359,7 +362,7 @@ for (i = 0; i < rawList.length; i++) {
 			//print(j);
 			
 			//break out of loop if puncta to paste would go beyond the bounds of the image
-			if(j + punctaWidth > width - 20){
+			if(j + punctaWidth > width - 10){
 					break;
 				}
 				
@@ -373,7 +376,7 @@ for (i = 0; i < rawList.length; i++) {
 				//print(k);
 				
 				//break out of loop if puncta to paste would go beyond the bounds of the image
-				if(k + punctaHeight > height - 20){
+				if(k + punctaHeight > height - 10){
 					break;
 				}
 				
