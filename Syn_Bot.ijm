@@ -793,7 +793,9 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 			//get noise estimation from image
 			run("Clear Results");
 			run("Measure");
-			red_sq_noiseStd = getResult("StdDev", 0);
+			//good estimate of noise for SynQuant is 0.5 times the image stddev
+			red_sq_noiseStd = getResult("StdDev", 0) * 0.5;
+			print("red_sq_noiseStd: " +red_sq_noiseStd);
 		}
 		
 		//creates param.txt for red channel
@@ -808,7 +810,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		print(param_file, "noiseStd=" + red_sq_noiseStd);
 		File.close(param_file);
 		
-		run("SynQuantBatch", currentParamPath);
+		run("SynQuantBatch", paramPath);
 		selectWindow("Synapse mask");
 		rename("red_thresholded");
 		setThreshold(128, 512);
@@ -1171,7 +1173,9 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 			//get noise estimation from image
 			run("Clear Results");
 			run("Measure");
-			green_sq_noiseStd = getResult("StdDev", 0);
+			//good estimate of noise for SynQuant is 0.5 times the image stddev
+			green_sq_noiseStd = getResult("StdDev", 0) * 0.5;
+			print("green_sq_noiseStd: " + green_sq_noiseStd);
 		}
 		
 		//creates param.txt for green channel
@@ -1186,7 +1190,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		print(param_file, "noiseStd=" + green_sq_noiseStd);
 		File.close(param_file);
 
-		run("SynQuantBatch", currentParamPath);
+		run("SynQuantBatch", paramPath);
 		selectWindow("Synapse mask");
 		rename("green_thresholded");
 		setThreshold(128, 512);
