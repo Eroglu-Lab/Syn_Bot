@@ -277,7 +277,7 @@ if(threshType == "SynQuant batch"){
 	//write parameter text files for SynQuant
 	
 	Dialog.create("Enter SynQuant Parameters");
-	Dialog.addMessage("for Red Channel");
+	Dialog.addMessage("Enter SynQuant Parameters for Red Channel");
 	Dialog.addNumber("Z score threshold", 10);
 	Dialog.addNumber("MinSize", 10);
 	Dialog.addNumber("MaxSize", 100);
@@ -285,7 +285,7 @@ if(threshType == "SynQuant batch"){
 	Dialog.addNumber("max WH ratio", 4);
 	Dialog.addNumber("zAxisMultiplier", 1);
 	Dialog.addNumber("noiseStd", 20);
-	Dialog.addCheckbox("Auto Detect noiseStd?", true);
+	Dialog.addCheckbox("Auto Detect noiseStd?", false);
 	Dialog.show();
 		
 	red_sq_zscore_thres = Dialog.getNumber();
@@ -300,7 +300,7 @@ if(threshType == "SynQuant batch"){
 	
 	
 	Dialog.create("Enter SynQuant Parameters");
-	Dialog.addMessage("for Green Channel");
+	Dialog.addMessage("Enter SynQuant Parameters for Green Channel");
 	Dialog.addNumber("Z score threshold", 10);
 	Dialog.addNumber("MinSize", 10);
 	Dialog.addNumber("MaxSize", 100);
@@ -308,7 +308,7 @@ if(threshType == "SynQuant batch"){
 	Dialog.addNumber("max WH ratio", 4);
 	Dialog.addNumber("zAxisMultiplier", 1);
 	Dialog.addNumber("noiseStd", 20);
-	Dialog.addCheckbox("Auto Detect noiseStd?", true);
+	Dialog.addCheckbox("Auto Detect noiseStd?", false);
 	Dialog.show();
 		
 	green_sq_zscore_thres = Dialog.getNumber();
@@ -360,6 +360,11 @@ if(threshType == "ilastik"){
 	//print(ilpRedDir);
 	//print(ilpGreenDir);
 	run("Configure ilastik for Syn_Bot", "executablefile=["+ilastikDir+"] numthreads=-1 maxrammb=4096");
+	
+	Dialog.create("Choose ilastik confidence");
+	Dialog.addNumber("ilastik confidence threshold", 0.5);
+	Dialog.show();
+	ilastik_confidence = Dialog.getNumber();
 }
 
 if (brightBool == true) {
@@ -875,8 +880,8 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		
 		selectWindow("C1-" + ilastikTitle);
 		
-		//only keep pixels where ilastik is at least 90% confident
-		lower = 0.9000;
+		//only keep pixels where ilastik is at least ilastik_confidence% confident
+		lower = ilastik_confidence;
 		upper = 1e30;
 		setThreshold(lower, upper);
 		run("Convert to Mask");
@@ -1261,8 +1266,8 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		
 		selectWindow("C1-" + ilastikTitle);
 		
-		//only keep pixels where ilastik is at least 90% confident
-		lower = 0.9000;
+		//only keep pixels where ilastik is at least ilastik_confidence% confident
+		lower = ilastik_confidence;
 		upper = 1e30;
 		setThreshold(lower, upper);
 		run("Convert to Mask");
