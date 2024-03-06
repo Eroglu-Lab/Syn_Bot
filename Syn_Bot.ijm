@@ -805,6 +805,12 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		
 		//creates param.txt for red channel
 		paramPath = getDirectory("imagej") + File.separator + "param.txt";
+		
+		//delete param if one already exists
+		if(File.exists(paramPath) == 1){
+			File.delete(paramPath);
+		}
+		
 		param_file = File.open(paramPath);
 		print(param_file, "zscore_thres=" + red_sq_zscore_thres);
 		print(param_file, "MinSize=" + red_sq_minSize);
@@ -1185,6 +1191,12 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		
 		//creates param.txt for green channel
 		paramPath = getDirectory("imagej") + File.separator + "param.txt";
+		
+		//delete param if one already exists
+		if(File.exists(paramPath) == 1){
+			File.delete(paramPath);
+		}
+		
 		param_file = File.open(paramPath);
 		print(param_file, "zscore_thres=" + green_sq_zscore_thres);
 		print(param_file, "MinSize=" + green_sq_minSize);
