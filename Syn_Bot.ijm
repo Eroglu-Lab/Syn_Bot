@@ -1031,7 +1031,10 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	}
 	else{selectWindow("From_ROI-1");}
 	rename("red_thresholded");
-	close("From_ROI");
+	
+	if(checkForImage("From_ROI")){
+		close("From_ROI");
+	}
 	
 	//waitForUser("After From ROI");
 	
@@ -1390,7 +1393,11 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	}
 	else{selectWindow("From_ROI-1");}
 	rename("green_thresholded");
-	close("From-ROI");
+	
+	if(checkForImage("From_ROI")){
+		close("From_ROI");
+	}
+	
 	
 	//save the green thresholded image
 	saveAs("tiff", dir2 + splitName[0] + "_greenThresholded_" + toString(currentOffset) + ".tiff");
@@ -2591,4 +2598,23 @@ function lif2tif(dir1){
 setBatchMode(false);
 }
 
+
+function checkForImage(string) { 
+// function for checking if an image with the name given by string exists
+	existsBool = false;
+	namesList = getList("image.titles");
+	
+	if(namesList.length == 0){
+		existsBool = false;
+		return existsBool;
+	}
+	
+	for (ii = 0; ii < namesList.length; ii++) {
+		currentName = namesList[ii];
+		if(currentName == string){
+			existsBool = true;
+		}
+	}
+	return existsBool;
+}
 		
