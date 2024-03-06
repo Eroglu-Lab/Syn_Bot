@@ -6,15 +6,15 @@
 noiseMultiplier = 0.50;
 
 redMinPixel = 10;
-redMaxString = "Infinity"
+redMaxString = 50;
 
 greenMinPixel = 10;
-greenMaxString = "Infinity"
+greenMaxString = 50;
 
 redThreshValue = 90;
 greenThreshValue = 90;
 
-setBatchMode(true);
+
 
 //open image
 //split channgels
@@ -33,7 +33,7 @@ rawList = getFileList(dirRaw);
 //dirGreenThresh = dir1 + File.separator + "green_thresh";
 //greenThreshList = getFileList(dirGreenThresh);
 
-dirRedThresh = dir1 + File.separator + "red_thresh"
+dirRedThresh = dir1 + File.separator + "red_thresh";
 File.makeDirectory(dirRedThresh);
 
 dirGreenThresh = dir1 + File.separator + "green_thresh";
@@ -47,6 +47,8 @@ File.makeDirectory(dirGreenBackground);
 
 dirOut = dir1 + File.separator + "output";
 File.makeDirectory(dirOut);
+
+dirImagej = getDirectory("imagej");
 
 
 
@@ -160,15 +162,21 @@ for (i = 0; i < rawList.length; i++) {
 	
 	run("Split Channels");
 	selectWindow(title + " (red)");
-	
-	dirRedPuncta = dir1 + "red_puncta_images/";
-	File.makeDirectory(dirRedPuncta);
-	print(dirRedPuncta);
 
 	//save the first 10 red puncta
-
-	roiManager("Select", newArray(0,1,2,3,4,5,6,7,8,9));
-	RoiManager.multiCrop(dirRedPuncta, " save tif");
+	
+	//save the puncta so we can find them again
+	for ( ii= 0; ii < 10; ii++) {
+	
+		run("Duplicate...", " ");
+		rename("current_puncta");
+		roiManager("select", ii);
+		run("Clear Outside");
+		run("Crop");
+		saveAs("tiff", dirImagej + File.separator + "red_puncta_" + ii);
+		close();
+		
+	}
 	
 	close("*");
 	roiManager("reset");
@@ -221,27 +229,47 @@ for (i = 0; i < rawList.length; i++) {
 	
 	run("Split Channels");
 	selectWindow(title + " (green)");
-	
-	dirGreenPuncta = dir1 + "green_puncta_images/";
-	File.makeDirectory(dirGreenPuncta);
-	print(dirGreenPuncta);
 
 	//save the first 10 green puncta
 
-	roiManager("Select", newArray(0,1,2,3,4,5,6,7,8,9));
-	RoiManager.multiCrop(dirGreenPuncta, " save tif");
+	//save the puncta so we can find them again
+	for ( ii= 0; ii < 10; ii++) {
+	
+		run("Duplicate...", " ");
+		rename("current_puncta");
+		roiManager("select", ii);
+		run("Clear Outside");
+		run("Crop");
+		saveAs("tiff", dirImagej + File.separator + "green_puncta_" + ii);
+		close();
+	
+	}
 	
 	close("*");
 	roiManager("reset");
 	
 	//paste on fake synapses
 
-	redPunctaList = getFileList(dirRedPuncta);
+	redBackgroundList = getFileList(dirRedBackground);
+
+	imagejList = getFileList(dirImagej);
+	
+	redPunctaList = newArray(10);
 	
 	skipj = 0;
 	skipk = 0;
 	
-	redBackgroundList = getFileList(dirRedBackground);
+	iterator = 0;
+	
+	//get list of just red_puncta images
+	for (ii = 0; ii < imagejList.length; ii++) {
+
+		currentFile = imagejList[ii];
+		if(indexOf(currentFile, "red_puncta_") >= 0){
+			redPunctaList[iterator] = currentFile;
+			iterator = iterator + 1;
+		}
+	}
 	
 	open(dirRedBackground + File.separator + redBackgroundList[i]);
 	title = getTitle();
@@ -254,12 +282,9 @@ for (i = 0; i < rawList.length; i++) {
 	
 		
 		
-		open(dirRedPuncta + File.separator + redPunctaList[m]);
+		open(dirImagej + File.separator + redPunctaList[m]);
 		
 		rename("current_puncta");
-		
-		//clear outside to get only the puncta
-		run("Clear Outside");
 		
 		getDimensions(punctaWidth, punctaHeight, channels, slices, frames);
 		
@@ -311,6 +336,8 @@ for (i = 0; i < rawList.length; i++) {
 		//skipk = skipk + 5;
 		
 		close("current_puncta");
+		//delete the red puncta after we use it
+		File.delete(dirImagej + File.separator + redPunctaList[m]);
 		
 	}
 	
@@ -325,12 +352,27 @@ for (i = 0; i < rawList.length; i++) {
 	
 	//paste on fake synapses
 
-	greenPunctaList = getFileList(dirGreenPuncta);
+	greenBackgroundList = getFileList(dirGreenBackground);
+
+	imagejList = getFileList(dirImagej);
+	
+	greenPunctaList = newArray(10);
 	
 	skipj = 0;
 	skipk = 0;
 	
-	greenBackgroundList = getFileList(dirGreenBackground);
+	iterator = 0;
+	
+	//get list of just green_puncta images
+	for (ii = 0; ii < imagejList.length; ii++) {
+
+		currentFile = imagejList[ii];
+		
+		if(indexOf(currentFile, "green_puncta_") >= 0){
+			greenPunctaList[iterator] = currentFile;
+			iterator = iterator + 1;
+		}
+	}
 	
 	open(dirGreenBackground + File.separator + greenBackgroundList[i]);
 	title = getTitle();
@@ -342,12 +384,9 @@ for (i = 0; i < rawList.length; i++) {
 	
 		
 		
-		open(dirGreenPuncta + File.separator + greenPunctaList[m]);
+		open(dirImagej + File.separator + greenPunctaList[m]);
 		
 		rename("current_puncta");
-		
-		//clear outside to get only the puncta
-		run("Clear Outside");
 		
 		getDimensions(punctaWidth, punctaHeight, channels, slices, frames);
 		
@@ -364,7 +403,7 @@ for (i = 0; i < rawList.length; i++) {
 			
 			//break out of loop if puncta to paste would go beyond the bounds of the image
 			if(j + punctaWidth > width - 10){
-					break;
+				break;
 				}
 				
 			//break if we already used this j for a different puncta
@@ -394,7 +433,10 @@ for (i = 0; i < rawList.length; i++) {
 		skipj = skipj + 20;
 		//skipk = skipk + 5;
 		
-		close("current_");
+		close("current_puncta");
+		
+		//delete the green puncta after we use it
+		File.delete(dirImagej + File.separator + greenPunctaList[m]);
 		
 	}
 	
