@@ -1,12 +1,13 @@
 //generates simulated images by creating a background image of gaussian noise and 
 //then pasting on puncta from an image
+//Sparse version generates 1/3 red only, 1/3 green only, and 1/3 red and green
 
 //multiply noise by this to increase or decrease proportionally
 //adds more or less background, 0 gives black background
 noiseMultiplier = 0.50;
 //get string of noiseMultiplier and replace the "." with "_". 
 //Requires a number with digits before and after the decimal point
-noiseArray = d2s(noiseMultiplier, 2);
+noiseArray = split(d2s(noiseMultiplier, 2),".");
 noiseString = noiseArray[0] + "_" + noiseArray[1];
 
 redMinPixel = 10;
@@ -328,14 +329,16 @@ for (i = 0; i < rawList.length; i++) {
 				if(redPrint == 1){
 					//waitForUser("check paste");
 					Image.paste(j,k);
-					redCount = 2;
+					redCount = redCount + 1;
+					redPrint = 2;
 					continue;
 				}
 				
 				if(redPrint == 2){
 					//waitForUser("check paste");
 					Image.paste(j,k);
-					redCount = 3;
+					redCount = redCount + 1;
+					redPrint = 3;
 					continue;
 				}
 				if(redPrint == 3){
@@ -442,20 +445,22 @@ for (i = 0; i < rawList.length; i++) {
 				
 				//paste green synapse 2/3 of the time on 2 and 3
 				if(greenPrint == 1){
-					greenCount = 2;
+					greenPrint = 2;
 					continue;
 				}
 				
 				if(greenPrint == 2){
 					//waitForUser("check paste");
 					Image.paste(j,k);
-					greenCount = 3;
+					greenCount = greenCount + 1;
+					greenPrint = 3;
 					continue;
 				}
 				if(greenPrint == 3){
 					//waitForUser("check paste");
 					Image.paste(j,k);
-					greenCount = 1;
+					greenCount = greenCount + 1;
+					greenPrint = 1;
 					continue;
 				}
 
