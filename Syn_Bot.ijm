@@ -154,7 +154,7 @@ if(dirSource == ""){
 	dirSource = getDir("Choose experimental directory");
 }
 
-//Not included
+//Not included
 
 //offsetBool = Dialog.getCheckbox();
 offsetBool = false;
@@ -439,7 +439,7 @@ if(threshType == "fromFile"){
 for(m = 0; m < listSource.length; m++){    
 	currentFile = listSource[m];
 	if ( indexOf(currentFile, ".") > -1){
-		exit("Your input file either doesn't follow the required Experiment/Group/Image file structure or contains a '.' or duplicate file name");
+		exit("Your input file either doesn't follow the required Experiment/Group/Image file structure or contains a '.' or duplicate file name");
 	}
 	//convert lif files to tif files in the same folder
 	//if(lifBool == true){
@@ -600,7 +600,7 @@ print(((endTime - startTime)/1000.0) + " seconds");
 //the rest of the parameters allow analyzePuncta to access the summary 
 //ouput arrays
 			
-// function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType,imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit , ilpRedDir, ilpGreenDir, ilpBlueDir){
+// function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType,imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit , ilpRedDir, ilpGreenDir, ilpBlueDir){
 function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, ilpRedDir, ilpGreenDir, ilpBlueDir){
 	//batch mode hides images and makes the macro run faster
 	setBatchMode(false);
@@ -1717,7 +1717,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		//close("ROI Manager");
 	}
 	
-	//runs actual colocalization calculations using circle or pixel based methods for either 2 or 3 channels
+	//runs actual colocalization calculations using circle or pixel based methods for either 2 or 3 channels
 	print("Counting colocalizations...");
 
 	if (analysisType == "Circular-approximation" && channelType == "2-Channel Colocalization (RG)"){
