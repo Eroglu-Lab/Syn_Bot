@@ -1,8 +1,12 @@
 /*  Syn_Bot
+ *   @authors
  *  Justin Savage
- *  7/5/23
+ *  Juan Ramirez
+ *  Yizhi Wang
+ *  3/4/24
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
+ *  SynQuant functionality depends on the SynQuantExtra plugin
  *  
  *  This macro is designed to analyze fluorescence microscopy images
  *  to determine the number of colocalizations between pre and postsynaptic
@@ -49,7 +53,7 @@ Dialog.create("Syn Bot");
 preprocessingList = newArray("Noise Reduction (Recommended)", "Brightness Adjustment (Use with caution)");
 channelList = newArray("2-Channel Colocalization (RG)", "3-Channel Colocalization (RGB)");
 threshTypes = newArray("Manual", "Fixed Value", "Percent Histogram", "FIJI auto",
-"ilastik", "Pre-Thresholded", "Threshold from File");
+"ilastik", "Pre-Thresholded", "Threshold from File", "SynQuant", "SynQuant batch");
 roiList = newArray("Whole Image", "Auto Cell Body", "Circle","Cell Territory" , "custom");
 analysisList = newArray("Circular-approximation", "Pixel-overlap");
 checkboxList = newArray("90-degree rotation control");
@@ -150,198 +154,13 @@ if(dirSource == ""){
 	dirSource = getDir("Choose experimental directory");
 }
 
-//Not included
+//Not included
 
 //offsetBool = Dialog.getCheckbox();
 offsetBool = false;
 
 //scrmbleControlBool = Dialog.getCheckbox();
 scrmbleControlBool = false;
-
-//lifBool = Dialog.getCheckbox();
-//print("pickChannelsBool = " + pickChannelsBool);
-
-
-
-//if(wizardString == "yes"){
-//	Dialog.create("Welcome");
-//	Dialog.addMessage("Welcome to the Syn_Bot Macro. \n This macro uses ImageJ to calculate colocalizations between pre and postynaptic puncta in fluorescence microscopy images.");
-//	Dialog.addMessage("The input to this macro is a big folder for your experiment that contains smallerfolders for each experimental group. \n The smaller folders for each experimental group contain microscope images to be analyzed. \n The macro will try to open, convert to RGB and ZProject these images \n (if any of these steps fail, preprocessing may be required.)");
-//	Dialog.addMessage("Prepare a folder using the Experiment/Experimental_Group/Images format and then click OK and select the prepared Experiment folder");
-//	Dialog.show();
-//	//Asks user for source directory (folder containing subfolder pairs)
-//	print("Choose Source Directory");
-//	dirSource  = getDirectory("Choose Source Directory ");
-//	listSource = getFileList(dirSource);
-//
-//	listOffset = newArray(1);
-//		//for each pair m
-//		for(m = 0; m < listSource.length; m++){    
-//			currentFile = listSource[m];
-//			if ( indexOf(currentFile, ".") > -1){
-//	
-//				exit("Your input file either doesn't follow the required Experiment/Group/Image file structure or contains a '.' or duplicate file name");
-//		}
-//		//opens the first image and checks if it is already processed or not
-//		firstImages = getFileList(dirSource + currentFile);
-//		firstImage = firstImages[0];
-//		zProjectBool = false;
-//		rgbBool = false;
-//		rgbBool = checkRGB(dirSource + currentFile + firstImage);
-//		zProjectBool = checkZStack(dirSource + currentFile + firstImage);
-//		
-//			//creates a subfolder for eah pair that will store the Z-projected, RGB
-//		//images and eventually all of the macro outputs
-//		dirOut = dirSource + currentFile +"Output"+File.separator;
-//		File.makeDirectory(dirOut);
-//		
-//		if (pickChannelsBool == true){
-//			dirCorrected = dirSource + currentFile + "Corrected" + File.separator;
-//			File.makeDirectory(dirCorrected);
-//			print("making corrected directory");
-//			
-//			//uses correctChannels to change channels if pickChannels is selected
-//			correctChannels(dirSource + currentFile, dirCorrected, channelsList);
-//		
-//			if (zProjectBool == true){
-//				//uses the projectPair function to Z-project images if necessary
-//				projectPair(dirCorrected, dirOut);
-//				}
-//			if (zProjectBool == false){
-//				//uses the processCellImages function to convert in vitro images
-//				//to RGB
-//				//print("dirSource + currentFile " + dirSource + currentFile);
-//				//print("dirOut " + dirOut);
-//				processCellImages(dirCorrected, dirOut);
-//				}
-//		}
-//		if (pickChannelsBool == false){
-//			if (zProjectBool == true){
-//				//uses the projectPair function to Z-project images if necessary
-//				projectPair(dirSource + currentFile, dirOut);
-//				}
-//			if (zProjectBool == false){
-//				//uses the processCellImages function to convert in vitro images
-//				//to RGB
-//				//print("dirSource + currentFile " + dirSource + currentFile);
-//				//print("dirOut " + dirOut);
-//				processCellImages(dirSource + currentFile, dirOut);
-//				}
-//		}
-//		
-//			
-//		//list of processed images in dirOut
-//		listZ = getFileList(dirOut);
-//		//for each image in dirOut
-//		for(i = 0; i < 1; i++){
-//			currentImage = listZ[i];
-//			//for each threshold offset in listOffset
-//			//the main analyzePuncta function is applied to each image
-//			print("dirOut is " + dirOut);
-//			print("dirOut + currentImage is " + dirOut + currentImage);
-//
-//			//This is where the wizard should run to get the parameters
-//			dir1 = dirOut + currentImage;
-//			setBatchMode(false);
-//			run("Bio-Formats Importer", "open=["+dir1+"] color_mode=Composite rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
-//			titleArray = split(dir1, "/");
-//			title = titleArray[titleArray.length-1];
-//			
-//			print("indexOf " + indexOf(title, "Output"));
-//			
-//			titleTemp = title;
-//				
-//			if (indexOf(title, "Output") >= 0){
-//				z = indexOf(title, "Output");
-//				print("z is " + z);
-//				titleTemp = substring(title, z + 7, lengthOf(title));
-//				title = titleTemp;
-//			}
-//
-//
-//			run("RGB Color");
-//			
-//			close(title);
-//			selectWindow(title + " (RGB)");
-//			rename(title);
-//				
-//			print("title is " + title);
-//			run("Select All");
-//			getPixelSize(unit, pixelWidth, pixelHeight);
-//				 
-//			run("Set Scale...", "distance=0 known=0 pixel=1 unit=pixel");
-//			
-//			run("Split Channels");
-//
-//			//close blue
-//			close(title + " (blue)");
-//
-//			selectWindow(title + " (red)");
-//			splitName = split(titleTemp, ".");
-//			print("splitName is " + splitName[0]);
-//			run("Select All");
-//
-//			run("Duplicate...", "title=noise_reduced");
-//
-//			selectWindow("noise_reduced");
-//			run("Subtract Background...", "rolling=50");
-//			run("Gaussian Blur...", "sigma=0.57");
-//
-//			Dialog.create("Red Channel Puncta");
-//			Dialog.addMessage("Displayed is the Red Channel of your first image. \n The first choice for the macro is whether this image needs the built in denoising features. \n The displayed image named noise_reduced has used our internal subtract background and gaussian blur. \n If this image doesn't look good, either use the raw image or complete your own denoising prior to using this macro. \n If you're using ilastik or other machine learning based thresholding algorithms, you should not use built-in denoising.");
-//			items = newArray("yes", "no");
-//			Dialog.addRadioButtonGroup("Would you like to use built-in denoising?", items, 1, 2, "yes");
-//			Dialog.show();
-//			noiseString = Dialog.getRadioButton();
-//			close("noise_reduced");
-//			selectWindow(title + " (red)");
-//			if(noiseString == "yes"){
-//				run("Subtract Background...", "rolling=50");
-//				run("Gaussian Blur...", "sigma=0.57");
-//			}
-//
-//			run("Threshold...");
-//
-//			Dialog.create("Red Channel Puncta II");
-//			Dialog.addMessage("The next parameter to determine is the threshold for the image. \n This is a pixel intensity value that separates pixels darker than that value (background) \n from pixels brighter than this value (foreground). \n There are 6 ways to threshold images for this macro. \n \n 1. Manual mode which allows manual thresholding for each image \n 2. Fixed value which uses a single threshold value for each image \n 3. Percent Threshold which uses a custom algorithm to apply a threshold keeping the top n% of pixels in the image \n 4. FIJI auto which uses any of the built-in automatic thresholding methods in FIJI \n 5. ilastik which uses the machine learning application ilastik to threshold images \n 6. Pre-Thresholded which allows images to be thresholded outside of Syn_Bot \n Adjust the threshold of the displayed image until you feel it correctly captures the desired puncta. \n Note either the threshold value or percent if you plan to use methods 2 or 3 \n You can try the automated FIJI methods using Image>Adjust>AutoThreshold and should note the name of the method that works best \n ilastik or Pre-Thresholded methods must be prepared outside of Syn_Bot (see ilastik.org) \n \n Click Ok to begin adjusting the threshold");
-//			Dialog.show();
-//
-//			waitForUser("Adjust the threshold of the displayed image until you feel it correctly captures the desired puncta. \n Note either the threshold value or percent if you plan to use methods 2 or 3 \n You can try the automated FIJI methods using Image>Adjust>AutoThreshold \n and should note the name of the method that works best \n \n Click Ok when done");
-//
-//			selectWindow(title + " (green)");
-//			if(noiseString == "yes"){
-//				run("Subtract Background...", "rolling=50");
-//				run("Gaussian Blur...", "sigma=0.57");
-//			}
-//
-//			run("Threshold...");
-//
-//			Dialog.create("Green Channel Puncta");
-//			Dialog.addMessage("The Green Channel is now displayed. \n The macro uses the same mode (Manual, Fixed Value, \n Percent Histogram, FIJI auto, ilastik or Pre-Thresholded) \n for each channel but different parameters can be used. \n \n Click Ok to begin adjusting the threshold");
-//			Dialog.show();
-//
-//			waitForUser("Adjust the threshold of the displayed image until you feel it correctly captures the desired puncta. \n Note either the threshold value or percent if you plan to use methods 2 or 3 \n You can try the automated FIJI methods using Image>Adjust>AutoThreshold \n and should note the name of the method that works best \n \n Click Ok when done");
-//
-//			waitForUser("There are only a few other settings necessary for the macro. \n \n 1. Analysis Type: Syn_Bot can calculate colocalizations either by approximating each punctum to a circle \n and then comparing the circles from each channel \n or by directly comparing the pixels in each channel to see which are part of puncta in each channel. \n 2. Channels: Syn_Bot can analyze either 2 (Red and Green) or 3 (Red, Green and Blue) channels. \n Since Syn_Bot analyzes the images in the RGB, images acquired in other color channels should be \n changed to these using the Lookup Tables in FIJI \n 3. Min Pixel Size: This denotes the smallest particle you wish to be counted \n as a true punctum. Examine your image and note the pixel size given when drawing an ROI \n around a typical punctum \n 4. ROI Type: Whole Image is used most often, but a circular ROI around a cell body or \n custom ROI around certain structures are also available. \n For further help and information see https://github.com/Eroglu-Lab/Syn_Bot \n \n Click Ok to begin the macro.");
-//			close("*");
-//			print("dirOut is: " + dirOut);
-//			listZ = getFileList(dirOut);
-//			for (i =0; i < listZ.length; i++){
-//				currentImage = listZ[i];
-//				File.delete(dirOut + currentImage);
-//				//print("deleting " + currentImage);
-//			}
-//			File.delete(dirOut);
-//			wizardString = "no";
-//		}
-//	}
-//	
-//	//Creates a dialog window for the user to input relevant parameters
-//	Dialog.create("Syn Bot Wizard Complete");
-//	Dialog.addMessage("Please close this window and reopen SynBot to continue");
-//	Dialog.show();
-//	exit();
-//}
 
 
 //sets roi Radius
@@ -454,6 +273,55 @@ if (threshType == "FIJI auto"){
 	blueAutoConstant = Dialog.getNumber();
 }
 
+if(threshType == "SynQuant batch"){
+	//write parameter text files for SynQuant
+	
+	Dialog.create("Enter SynQuant Parameters");
+	Dialog.addMessage("Enter SynQuant Parameters for Red Channel");
+	Dialog.addNumber("Z score threshold", 10);
+	Dialog.addNumber("MinSize", 10);
+	Dialog.addNumber("MaxSize", 100);
+	Dialog.addNumber("minFill", 0.5);
+	Dialog.addNumber("max WH ratio", 4);
+	Dialog.addNumber("zAxisMultiplier", 1);
+	Dialog.addNumber("noiseStd", 20);
+	Dialog.addCheckbox("Auto Detect noiseStd?", false);
+	Dialog.show();
+		
+	red_sq_zscore_thres = Dialog.getNumber();
+	red_sq_minSize = Dialog.getNumber();
+	red_sq_maxSize = Dialog.getNumber();
+	red_sq_minFill = Dialog.getNumber();
+	red_sq_maxWHRatio = Dialog.getNumber();
+	red_sq_zAxisMultiplier = Dialog.getNumber();
+	red_sq_noiseStd = Dialog.getNumber();
+	red_noiseEstBool = Dialog.getCheckbox();
+		
+	
+	
+	Dialog.create("Enter SynQuant Parameters");
+	Dialog.addMessage("Enter SynQuant Parameters for Green Channel");
+	Dialog.addNumber("Z score threshold", 10);
+	Dialog.addNumber("MinSize", 10);
+	Dialog.addNumber("MaxSize", 100);
+	Dialog.addNumber("minFill", 0.5);
+	Dialog.addNumber("max WH ratio", 4);
+	Dialog.addNumber("zAxisMultiplier", 1);
+	Dialog.addNumber("noiseStd", 20);
+	Dialog.addCheckbox("Auto Detect noiseStd?", false);
+	Dialog.show();
+		
+	green_sq_zscore_thres = Dialog.getNumber();
+	green_sq_minSize = Dialog.getNumber();
+	green_sq_maxSize = Dialog.getNumber();
+	green_sq_minFill = Dialog.getNumber();
+	green_sq_maxWHRatio = Dialog.getNumber();
+	green_sq_zAxisMultiplier = Dialog.getNumber();
+	green_sq_noiseStd = Dialog.getNumber();
+	green_noiseEstBool = Dialog.getCheckbox();
+		
+}
+
 ilastikDir = "";
 ilpRedDir = "";
 ilpGreenDir = "";
@@ -492,6 +360,11 @@ if(threshType == "ilastik"){
 	//print(ilpRedDir);
 	//print(ilpGreenDir);
 	run("Configure ilastik for Syn_Bot", "executablefile=["+ilastikDir+"] numthreads=-1 maxrammb=4096");
+	
+	Dialog.create("Choose ilastik confidence");
+	Dialog.addNumber("ilastik confidence threshold", 0.5);
+	Dialog.show();
+	ilastik_confidence = Dialog.getNumber();
 }
 
 if (brightBool == true) {
@@ -525,13 +398,11 @@ if (temp1 == true) {
 	offCenterBool = true;
 }
 
+
+
 //The following is the main chunk of the macro, which calls several
 //helper functions that are defined below it
 
-//Asks user for source directory (folder containing subfolder pairs)
-print("Choose Source Directory");
-//getting from the main menu now
-//dirSource  = getDirectory("Choose Source Directory ");
 listSource = getFileList(dirSource);
 
 startTime = getTime();
@@ -568,7 +439,7 @@ if(threshType == "fromFile"){
 for(m = 0; m < listSource.length; m++){    
 	currentFile = listSource[m];
 	if ( indexOf(currentFile, ".") > -1){
-		exit("Your input file either doesn't follow the required Experiment/Group/Image file structure or contains a '.' or duplicate file name");
+		exit("Your input file either doesn't follow the required Experiment/Group/Image file structure or contains a '.' or duplicate file name");
 	}
 	//convert lif files to tif files in the same folder
 	//if(lifBool == true){
@@ -657,7 +528,6 @@ for(m = 0; m < listSource.length; m++){
 			iterator = iterator + 1;	
 		}
 	}
-}
 
 
 //Removes empty indices from arrays
@@ -730,10 +600,10 @@ print(((endTime - startTime)/1000.0) + " seconds");
 //the rest of the parameters allow analyzePuncta to access the summary 
 //ouput arrays
 			
-// function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType,imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit , ilpRedDir, ilpGreenDir, ilpBlueDir){
+// function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType,imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit , ilpRedDir, ilpGreenDir, ilpBlueDir){
 function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, ilpRedDir, ilpGreenDir, ilpBlueDir){
 	//batch mode hides images and makes the macro run faster
-	setBatchMode(true);
+	setBatchMode(false);
 	
 	//print("in analyze puncta");
 
@@ -848,6 +718,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 
 	if (threshType == "Manual"){
 		//shows image for manual thresholding
+		percentThreshold(2);
 		run("Threshold...");
 		setBatchMode("show");
 		waitForUser("Set Threshold and click OK");
@@ -908,6 +779,60 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 			run("Convert to Mask");
 		}
 	}
+	
+	if (threshType == "SynQuant"){
+		setBatchMode(false);
+		run("SynQuantSimple");
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		redLower = 0;
+		redUpper = 0;
+	}
+	
+	if (threshType == "SynQuant batch"){
+		//run SynQuantBatch using the paramters from param.txt
+		if(red_noiseEstBool == true){
+			//get noise estimation from image
+			run("Clear Results");
+			run("Measure");
+			//good estimate of noise for SynQuant is 0.5 times the image stddev
+			red_sq_noiseStd = getResult("StdDev", 0) * 0.5;
+			print("red_sq_noiseStd: " +red_sq_noiseStd);
+		}
+		
+		//creates param.txt for red channel
+		paramPath = getDirectory("imagej") + File.separator + "param.txt";
+		
+		//delete param if one already exists
+		if(File.exists(paramPath) == 1){
+			File.delete(paramPath);
+		}
+		
+		param_file = File.open(paramPath);
+		print(param_file, "zscore_thres=" + red_sq_zscore_thres);
+		print(param_file, "MinSize=" + red_sq_minSize);
+		print(param_file, "MaxSize=" + red_sq_maxSize);
+		print(param_file, "minFill=" + red_sq_minFill);
+		print(param_file, "maxWHRatio=" + red_sq_maxWHRatio);
+		print(param_file, "zAxisMultiplier=" + red_sq_zAxisMultiplier);
+		print(param_file, "noiseStd=" + red_sq_noiseStd);
+		File.close(param_file);
+		
+		run("SynQuantBatch", paramPath);
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		redLower = 0;
+		redUpper = 0;
+		File.delete(paramPath);
+	}
 
 	if (threshType == "ilastik"){
 
@@ -962,8 +887,8 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		
 		selectWindow("C1-" + ilastikTitle);
 		
-		//only keep pixels where ilastik is at least 90% confident
-		lower = 0.9000;
+		//only keep pixels where ilastik is at least ilastik_confidence% confident
+		lower = ilastik_confidence;
 		upper = 1e30;
 		setThreshold(lower, upper);
 		run("Convert to Mask");
@@ -1107,7 +1032,10 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	}
 	else{selectWindow("From_ROI-1");}
 	rename("red_thresholded");
-	close("From_ROI");
+	
+	if(checkForImage("From_ROI")){
+		close("From_ROI");
+	}
 	
 	//waitForUser("After From ROI");
 	
@@ -1181,6 +1109,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 
 	if (threshType == "Manual"){
 		//shows image for manual thresholding
+		percentThreshold(2);
 		run("Threshold...");
 		setBatchMode("show");
 		waitForUser("Set Threshold and click OK");
@@ -1237,6 +1166,62 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		if (analysisType == "Pixel-overlap"){
 			run("Convert to Mask");
 		}
+	}
+	
+	if (threshType == "SynQuant"){
+		setBatchMode(false);
+		run("SynQuantSimple");
+		selectWindow("Synapse mask");
+		rename("red_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		greenLower = 0;
+		greenUpper = 0;
+	}
+	
+	if (threshType == "SynQuant batch"){
+		//run SynQuantBatch using the paramters from param.txt
+		
+		
+		if(green_noiseEstBool == true){
+			//get noise estimation from image
+			run("Clear Results");
+			run("Measure");
+			//good estimate of noise for SynQuant is 0.5 times the image stddev
+			green_sq_noiseStd = getResult("StdDev", 0) * 0.5;
+			print("green_sq_noiseStd: " + green_sq_noiseStd);
+		}
+		
+		//creates param.txt for green channel
+		paramPath = getDirectory("imagej") + File.separator + "param.txt";
+		
+		//delete param if one already exists
+		if(File.exists(paramPath) == 1){
+			File.delete(paramPath);
+		}
+		
+		param_file = File.open(paramPath);
+		print(param_file, "zscore_thres=" + green_sq_zscore_thres);
+		print(param_file, "MinSize=" + green_sq_minSize);
+		print(param_file, "MaxSize=" + green_sq_maxSize);
+		print(param_file, "minFill=" + green_sq_minFill);
+		print(param_file, "maxWHRatio=" + green_sq_maxWHRatio);
+		print(param_file, "zAxisMultiplier=" + green_sq_zAxisMultiplier);
+		print(param_file, "noiseStd=" + green_sq_noiseStd);
+		File.close(param_file);
+
+		run("SynQuantBatch", paramPath);
+		selectWindow("Synapse mask");
+		rename("green_thresholded");
+		setThreshold(128, 512);
+		if (analysisType == "Pixel-overlap"){
+			run("Convert to Mask");
+		}
+		greenLower = 0;
+		greenUpper = 0;
+		File.delete(paramPath);
 	}
 
 	if (threshType == "ilastik"){
@@ -1298,8 +1283,8 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		
 		selectWindow("C1-" + ilastikTitle);
 		
-		//only keep pixels where ilastik is at least 90% confident
-		lower = 0.9000;
+		//only keep pixels where ilastik is at least ilastik_confidence% confident
+		lower = ilastik_confidence;
 		upper = 1e30;
 		setThreshold(lower, upper);
 		run("Convert to Mask");
@@ -1410,7 +1395,11 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	}
 	else{selectWindow("From_ROI-1");}
 	rename("green_thresholded");
-	close("From-ROI");
+	
+	if(checkForImage("From_ROI")){
+		close("From_ROI");
+	}
+	
 	
 	//save the green thresholded image
 	saveAs("tiff", dir2 + splitName[0] + "_greenThresholded_" + toString(currentOffset) + ".tiff");
@@ -1486,6 +1475,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 			//uses percent Threshold for starting point
 			//percentThreshold(blueHisto);
 			//shows image for manual thresholding
+			percentThreshold(2);
 			run("Threshold...");
 			setBatchMode("show");
 			waitForUser("Set Threshold and click OK");
@@ -1727,7 +1717,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		//close("ROI Manager");
 	}
 	
-	//runs actual colocalization calculations using circle or pixel based methods for either 2 or 3 channels
+	//runs actual colocalization calculations using circle or pixel based methods for either 2 or 3 channels
 	print("Counting colocalizations...");
 
 	if (analysisType == "Circular-approximation" && channelType == "2-Channel Colocalization (RG)"){
@@ -2611,4 +2601,23 @@ function lif2tif(dir1){
 setBatchMode(false);
 }
 
+
+function checkForImage(string) { 
+// function for checking if an image with the name given by string exists
+	existsBool = false;
+	namesList = getList("image.titles");
+	
+	if(namesList.length == 0){
+		existsBool = false;
+		return existsBool;
+	}
+	
+	for (ii = 0; ii < namesList.length; ii++) {
+		currentName = namesList[ii];
+		if(currentName == string){
+			existsBool = true;
+		}
+	}
+	return existsBool;
+}
 		

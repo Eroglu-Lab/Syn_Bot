@@ -1,5 +1,0 @@
-"0",""
-"0","ggplot(summarize(group_by(manual_synbot_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + "
-"0","  geom_col() + "
-"0","  geom_jitter(data = manual_synbot_data, aes(x = condition, y = Colocalized.Puncta.Count)) +"
-"0","  labs(title = ""in vivo Synapses Manual SynBot"")"

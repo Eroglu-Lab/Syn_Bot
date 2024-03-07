@@ -1,3 +1,0 @@
-"0",""
-"0","#plot the FSC vs. SSC (where we draw P1 gate from)"
-"0","autoplot(tube_1_unmixed, x = ""FSC-A"", y = ""SSC-A"", bins = 200)"
