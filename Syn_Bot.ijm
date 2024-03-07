@@ -718,6 +718,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 
 	if (threshType == "Manual"){
 		//shows image for manual thresholding
+		percentThreshold(2);
 		run("Threshold...");
 		setBatchMode("show");
 		waitForUser("Set Threshold and click OK");
@@ -1108,6 +1109,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 
 	if (threshType == "Manual"){
 		//shows image for manual thresholding
+		percentThreshold(2);
 		run("Threshold...");
 		setBatchMode("show");
 		waitForUser("Set Threshold and click OK");
@@ -1473,6 +1475,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 			//uses percent Threshold for starting point
 			//percentThreshold(blueHisto);
 			//shows image for manual thresholding
+			percentThreshold(2);
 			run("Threshold...");
 			setBatchMode("show");
 			waitForUser("Set Threshold and click OK");
