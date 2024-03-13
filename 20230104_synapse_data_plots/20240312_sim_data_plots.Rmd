@@ -1,0 +1,200 @@
+---
+title: "20240306_sim_data_plots"
+output: html_document
+date: "2024-03-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load libraries}
+library(tidyverse)
+library(ggplot2)
+library(agricolae)
+library(ggsignif)
+library(multcomp)
+library(nlme)
+```
+
+
+```{r load data}
+
+#manual_synbot_data <- read.csv("a2d1_invivo_data/20230119_juan_manual_cleaned.csv")
+#ilastik_data <- read.csv("a2d1_invivo_data/20230125_2_ilastik.csv")
+
+manual_synbot_data <- read.csv("simulated_data/sim_sparse_manual.csv")
+ilastik_data <- read.csv("simulated_data/sim_sparse_ilastik.csv")
+synquant_data <- read.csv("simulated_data/sim_sparse_synquant_10_12.csv")
+#SynQuant params:
+# zscore_thres=10
+# MinSize=10
+# MaxSize=100
+# minFill=0.5
+# maxWHRatio=4
+# zAxisMultiplier=1
+# noiseStd=12
+
+
+
+```
+
+
+
+```{r add sample metadata in loop}
+
+#fix weird column names
+colnames(manual_synbot_data) <- colnames(ilastik_data)
+colnames(synquant_data) <- colnames(ilastik_data)
+
+#label data with the analysis type used
+manual_synbot_data$analysis_type <- "manual_synbot"
+ilastik_data$analysis_type <- "ilastik"
+synquant_data$analysis_type <- "synquant"
+
+dfList <- list(manual_synbot_data, ilastik_data, synquant_data)
+
+for(i in 1:length(dfList)){
+  #initialize columns
+  dfList[[i]]$condition <- "unknown"
+  dfList[[i]]$noise_level <- "unknown"
+  
+  #label data with experimental condition
+  dfList[[i]][which(grepl("*WT*", dfList[[i]]$Image)),]$condition <- "WT"
+  dfList[[i]][which(grepl("*KO*", dfList[[i]]$Image)),]$condition <- "KO"
+
+  #make condition a factor so that it always plots in WT then KO order
+  dfList[[i]]$condition <- factor(dfList[[i]]$condition, levels = c("WT", "KO"))
+  
+  #lable data with noise level
+  dfList[[i]][which(grepl("0_00", dfList[[i]]$Image)),]$noise_level <- "0.00"
+  dfList[[i]][which(grepl("0_25", dfList[[i]]$Image)),]$noise_level <- "0.25"
+  dfList[[i]][which(grepl("0_50", dfList[[i]]$Image)),]$noise_level <- "0.50"
+  dfList[[i]][which(grepl("0_75", dfList[[i]]$Image)),]$noise_level <- "0.75"
+  dfList[[i]][which(grepl("1_00", dfList[[i]]$Image)),]$noise_level <- "1.00"
+  
+  dfList[[i]]$noise_level <- factor(dfList[[i]]$noise_level, levels = c("0.00", "0.25", "0.50", "0.75", "1.00"))
+  
+  dfList[[i]]$image_id <- seq.int(nrow(dfList[[i]]))
+}
+
+manual_synbot_data <- dfList[[1]]
+ilastik_data <- dfList[[2]]
+synquant_data <- dfList[[3]]
+
+
+```
+
+
+
+```{r stats}
+
+t.test(Colocalized.Puncta.Count ~ condition, manual_synbot_data)
+
+t.test(Colocalized.Puncta.Count ~ condition, ilastik_data)
+
+t.test(Colocalized.Puncta.Count ~ condition, synquant_data)
+
+#combine data into one data frame
+
+combined_data <- rbind(manual_synbot_data, ilastik_data)
+
+combined_data <- rbind(combined_data, synquant_data)
+
+model_1 <- aov(Colocalized.Puncta.Count ~ analysis_type, combined_data)
+
+summary(anova(model_1))
+
+
+```
+
+```{r plot synapse counts}
+
+ggplot(summarize(group_by(manual_synbot_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") + 
+  geom_jitter(data = manual_synbot_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vivo Synapses Manual SynBot", y = "Colocalized Puncta per Image") 
+
+#ggsave("invivo_a2d1_manual.pdf", width = 3.5, height = 5)
+
+ggplot(summarize(group_by(ilastik_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = ilastik_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vivo Synapses ilastik SynBot", y = "Colocalized Puncta per Image") 
+
+#ggsave("invivo_a2d1_ilastik.pdf", width = 3.5, height = 5)
+
+ggplot(summarize(group_by(synquant_data, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`)) + 
+  geom_col(fill = NA, color = "black") +
+  geom_jitter(data = synquant_data, aes(x = condition, y = Colocalized.Puncta.Count)) +
+  labs(title = "in vivo Synapses SynQuant", y = "Colocalized Puncta per Image") 
+
+#ggsave("invivo_a2d1_synquant.pdf", width = 3.5, height = 5)
+
+```
+
+
+
+
+```{r faceted plots}
+
+ggplot(data= combined_data, aes(x=condition, y=Colocalized.Puncta.Count)) + 
+  geom_bar(stat = "summary", fill = NA, color = "black") +
+  facet_grid(cols = vars(analysis_type)) +
+  geom_jitter(size = 0.5, width = 0.1, aes(color = condition)) +
+  geom_point(data = summarize(group_by(combined_data, analysis_type, condition), mean(Colocalized.Puncta.Count)), aes(x = condition, y = `mean(Colocalized.Puncta.Count)`, color = condition), size = 3, position = position_dodge2(0.5)) +
+  labs(y = "colocalization of VGluT1 and PSD95") +
+  scale_color_manual(values = c("black", "black")) + theme(legend.position = "none")
+
+#ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_5_in_vivo/invivo_a2d1_faceted.pdf", width = 6.5, height = 3.5)
+
+```
+
+```{r faceted plots with truth}
+
+#combine data into one data frame
+
+combined_data <- rbind(manual_synbot_data, ilastik_data)
+
+combined_data <- rbind(combined_data, synquant_data)
+
+ggplot(data= combined_data, aes(x=analysis_type, y=Colocalized.Puncta.Count)) + 
+  facet_grid(cols = vars(noise_level)) +
+  geom_hline(yintercept = 333, linetype = 2, color = "gray") +
+  geom_dotplot(binwidth = 5, binaxis = "y", stackdir = "center", aes(x = analysis_type, y = Colocalized.Puncta.Count)) +
+  labs(y = "colocalization of VGluT1 and PSD95") +
+  scale_color_manual(values = c("black", "black")) + theme(legend.position = "none") 
+  
+
+#ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_5_in_vivo/invivo_a2d1_faceted.pdf", width = 6.5, height = 3.5)
+
+#ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+#  geom_dotplot(binaxis = "y", stackdir = "center")
+
+ggplot(data = combined_data) + 
+  #facet_grid(cols = vars(analysis_type)) +
+  geom_dotplot(binwidth = 5, binaxis = "y", stackdir = "center", aes(x = analysis_type, y = Colocalized.Puncta.Count)) +
+  geom_hline(yintercept = 333, linetype = 2, color = "gray")
+
+ggplot(data = combined_data) + 
+  #facet_grid(cols = vars(analysis_type)) +
+  geom_hline(yintercept = 333, linetype = 2, color = "black") +
+  geom_violin(fill = "yellow", aes(x = analysis_type, y = Colocalized.Puncta.Count))
+  
+
+```
+
+
+
+
+
+
+
+
+```{r session info}
+sessionInfo()
+
+```
+
+
+
