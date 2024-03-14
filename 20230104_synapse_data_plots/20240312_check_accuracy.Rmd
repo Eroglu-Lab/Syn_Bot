@@ -131,32 +131,36 @@ output_df$true_neg_count <- 0
 
 ```{r calculate accuracy}
 
+#for each image
 for(m in length(redFiles)){
   
   currentData = colocDataIn[m]
   
-  for(i in length(currentData)){
-      currentX = currentData$X[i]
-      currentY = currentData$Y[i]
-
-    for(j in length(true_colocs)){
-      currentTrueX = true_colocs$x[j]
-      currentTrueY = true_colocs$y[j]
+  #for each location in the ground truth
+    for(i in length(true_colocs)){
+      currentTrueX = true_colocs$x[i]
+      currentTrueY = true_colocs$y[i]
+      
+      #set match_found to false and then set it to true if any of the puncta overlap the truth
+      match_found <- FALSE
+  
+      #for each puncta in the image
+      for(j in length(currentData)){
+          currentX = currentData$X[j]
+          currentY = currentData$Y[j]
       
       if(currentX > currentTrueX - 5 && currentX < currentTrueX + 5){
-        
         if(currentY > currentTrueY - 5 && currentY < currentTrueY + 5){
-          
-          output_df$true_pos_count[m] <- output_df$true_pos_count[m] + 1
-          
+          match_found <- TRUE
         }
-        
       }
-      
     }
       
-    if(output_df$true_pos_count[m] == 0){
-      
+    if(match_found == TRUE){
+      output_df$true_pos_count[m] <- output_df$true_pos_count[m] + 1
+    }
+    if(match_found == FALSE){
+      output_df$false_neg_count[m] <- output_df$false_neg_count[m] + 1
     }
     
   }
@@ -164,27 +168,6 @@ for(m in length(redFiles)){
 }
 
 
-for(i in 1:length(redDataIn)) {
-  currentData <- redDataIn[[i]]
-  redCircVector[i] <- mean(currentData$Circ.)
-}
-
-greenCircVector <- c("numeric", length(greenDataIn))
-
-for(i in 1:length(greenDataIn)) {
-  currentData <- greenDataIn[[i]]
-  greenCircVector[i] <- mean(currentData$Circ.)
-}
-
-#it seems to make vectors character type even if I say numeric
-redCircVector <- as.numeric(redCircVector)
-greenCircVector <- as.numeric(greenCircVector)
-
-
-print(paste("mean circularity for red ", mean(redCircVector)))
-print(paste("sd circularity for red ", sd(redCircVector)))
-print(paste("mean circularity for green ", mean(greenCircVector)))
-print(paste("sd circularity for green ", sd(greenCircVector)))
 ```
 
 
