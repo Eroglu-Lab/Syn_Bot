@@ -132,29 +132,29 @@ output_df$true_neg_count <- 0
 ```{r calculate accuracy}
 
 #for each image
-for(m in length(redFiles)){
+for(m in length(colocDataIn)){
   
-  currentData = colocDataIn[m]
+  currentData = colocDataIn[[m]]
   
   #for each location in the ground truth
     for(i in length(true_colocs)){
-      currentTrueX = true_colocs$x[i]
-      currentTrueY = true_colocs$y[i]
+      currentTrueX <- true_colocs$x[i]
+      currentTrueY <- true_colocs$y[i]
       
       #set match_found to false and then set it to true if any of the puncta overlap the truth
       match_found <- FALSE
   
       #for each puncta in the image
       for(j in length(currentData)){
-          currentX = currentData$X[j]
-          currentY = currentData$Y[j]
+          currentX <- currentData$colocX[j]
+          currentY <- currentData$colocY[j]
       
-      if(currentX > currentTrueX - 5 && currentX < currentTrueX + 5){
-        if(currentY > currentTrueY - 5 && currentY < currentTrueY + 5){
-          match_found <- TRUE
+        if(currentX > (currentTrueX - 5) && currentX < (currentTrueX + 5)){
+          if(currentY > (currentTrueY - 5) && currentY < (currentTrueY + 5)){
+            match_found <- TRUE
+          }
         }
       }
-    }
       
     if(match_found == TRUE){
       output_df$true_pos_count[m] <- output_df$true_pos_count[m] + 1
