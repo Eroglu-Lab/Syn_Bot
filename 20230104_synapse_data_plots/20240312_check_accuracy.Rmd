@@ -261,5 +261,22 @@ ggplot(data = output_df) +
 
 ```
 
+```{r plot read from file}
+
+output_df <- read.csv("output_df.csv", header = TRUE)
+
+recall_means <- summarize(group_by(output_df, noise_level), mean(recall)) 
+
+
+
+ggplot() + geom_line(data = recall_means, aes(x = noise_level, y = `mean(recall)`))  + ylim(0.5, 1) + geom_errorbar()
+
+precision_means <- summarize(group_by(output_df, noise_level), mean(precision))
+
+ggplot() + geom_line(data = precision_means, aes(x = noise_level, y = `mean(precision)`))  + ylim(0.5, 1)
+
+
+```
+
 
 
