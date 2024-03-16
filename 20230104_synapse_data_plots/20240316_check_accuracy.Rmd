@@ -366,9 +366,13 @@ recall_means$sd <- summarize(group_by(combined_data, noise_level, analysis_type)
 
 recall_means$sem <- recall_means$sd/sqrt(length(combined_data$recall))
 
-ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1)
+ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level")
+
+#ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_0_simulated_data/synbot_recall.pdf", width = 5, height = 2.75)
 
 ggplot(data = recall_means, aes(x = noise_level, y = recall)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type))
+
+ggplot(data = recall_means, aes(x = analysis_type, y = recall)) + geom_point(size = 1) + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(noise_level))
 
 precision_means <- summarize(group_by(combined_data, noise_level, analysis_type), mean(precision)) 
 
@@ -378,9 +382,13 @@ precision_means$sd <- summarize(group_by(combined_data, noise_level, analysis_ty
 
 precision_means$sem <- precision_means$sd/sqrt(length(combined_data$precision))
 
-ggplot(data = precision_means, aes(x = noise_level, y = precision, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1)
+ggplot(data = precision_means, aes(x = noise_level, y = precision, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level")
 
-ggplot(data = precision_means, aes(x = noise_level, y = precision)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type))
+#ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_0_simulated_data/synbot_precision.pdf", width = 5, height = 2.75)
+
+ggplot(data = precision_means, aes(x = noise_level, y = precision)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type)) 
+
+ggplot(data = precision_means, aes(x = analysis_type, y = precision)) + geom_point(size = 1) + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(noise_level)) 
 
 ```
 
