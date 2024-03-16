@@ -1,7 +1,7 @@
 ---
-title: "20240312_check_accuracy"
+title: "20240316_check_accuracy"
 output: html_document
-date: "2024-03-12"
+date: "2024-03-16"
 ---
 
 ```{r setup, include=FALSE}
@@ -178,9 +178,9 @@ output_df$recall <- output_df$true_pos_count/(output_df$true_pos_count+output_df
 ```
 
 
-```{r plot precision}
+```{r calculate precision}
 
-#precision is true positive / (true positve + false positive)
+#precision is true positive / (true positive + false positive)
 
 #for each image
 for(m in 1:length(colocDataIn)){
