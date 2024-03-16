@@ -83,9 +83,54 @@ for(i in 1:length(imageFiles)) {
 redFiles <- str_subset(fileList, pattern = 'redResults')
 greenFiles <- str_subset(fileList, pattern = 'greenResults')
 colocFiles <- str_subset(fileList, pattern = 'colocResults')
-redDataIn <- lapply(redFiles, read.csv)
-greenDataIn <- lapply(greenFiles, read.csv)
-colocDataIn <- lapply(colocFiles, read.csv)
+
+#check that all the files are not empty
+
+emptyRedList <- c()
+emptyGreenList <- c()
+emptyColocList <- c()
+
+fixedRedFiles <- c()
+
+for(i in 1:length(redFiles)){
+  currentSize <- file.size(redFiles[i])
+  if(currentSize <= 2){
+    emptyRedList <- c(emptyRedList, redFiles[i])
+  }
+  if(currentSize > 2){
+    fixedRedFiles <- c(fixedRedFiles, redFiles[i])
+  }
+}
+
+fixedGreenFiles <- c()
+
+for(i in 1:length(greenFiles)){
+  currentSize <- file.size(greenFiles[i])
+  if(currentSize <= 2){
+    emptyGreenList <- c(emptyGreenList, greenFiles[i])
+  }
+  if(currentSize > 2){
+    fixedGreenFiles <- c(fixedGreenFiles, greenFiles[i])
+  }
+}
+
+fixedColocFiles <- c()
+
+for(i in 1:length(colocFiles)){
+  currentSize <- file.size(colocFiles[i])
+  if(currentSize <= 2){
+    emptyColocList <- c(emptyColocList, colocFiles[i])
+  }
+  if(currentSize > 2){
+    fixedColocFiles <- c(fixedColocFiles, colocFiles[i])
+  }
+}
+
+#"D:/Eroglu_lab/images/sim_sparse_ilastik_1/group/Output/KO_Pair1_L2R1_1-3_sim_0_00_colocResults_0.csv"
+
+redDataIn <- lapply(fixedRedFiles, read.csv)
+greenDataIn <- lapply(fixedGreenFiles, read.csv)
+colocDataIn <- lapply(fixedColocFiles, read.csv)
 
 ```
 
@@ -118,7 +163,7 @@ for(i in 1:length(true_green$coord_string)){
 true_colocs <- filter(true_red, coord_string %in% true_green$coord_string)
 
 #initailize output data frame
-output_df <- data.frame(redFiles)
+output_df <- data.frame(fixedColocFiles)
 colnames(output_df) <- c("image")
 output_df$true_pos_count <- 0
 output_df$false_pos_count <- 0
@@ -173,7 +218,21 @@ for(m in 1:length(colocDataIn)){
   }
 }
 
+#add in empty images
+empty_colocs_df <- data.frame(emptyColocList)
+
+colnames(empty_colocs_df) <- c("image")
+empty_colocs_df$true_pos_count <- 0
+empty_colocs_df$false_pos_count <- 0
+empty_colocs_df$false_neg_count <- length(true_colocs$coord_string)
+empty_colocs_df$true_neg_count <- 0
+
+output_df <- rbind(output_df, empty_colocs_df)
+
 output_df$recall <- output_df$true_pos_count/(output_df$true_pos_count+output_df$false_neg_count)
+
+# change NaN values to zero
+output_df$recall[which(is.na(output_df$recall))] <- 0
 
 ```
 
@@ -225,6 +284,10 @@ for(m in 1:length(colocDataIn)){
 
 output_df$precision <- output_df$true_pos_count/(output_df$true_pos_count+output_df$false_pos_count)
 
+# change NaN values to zero
+output_df$precision[which(is.na(output_df$precision))] <- 0
+
+
 ```
 
 
@@ -232,15 +295,7 @@ output_df$precision <- output_df$true_pos_count/(output_df$true_pos_count+output
 
 
 #initialize columns
-output_df$condition <- "unknown"
 output_df$noise_level <- "unknown"
-
-#label data with experimental condition
-output_df[which(grepl("*WT*", output_df$image)),]$condition <- "WT"
-output_df[which(grepl("*KO*", output_df$image)),]$condition <- "KO"
-
-#make condition a factor so that it always plots in WT then KO order
-output_df$condition <- factor(output_df$condition, levels = c("WT", "KO"))
 
 #lable data with noise level
 output_df[which(grepl("0_00", output_df$image)),]$noise_level <- "0.00"
