@@ -345,4 +345,42 @@ ggplot(data = precision_means, aes(x = noise_level, y = precision)) + geom_line(
 ```
 
 
+```{r make faceted plots}
+
+manual_data <- read.csv("output_df_manual.csv")
+manual_data$analysis_type <- "manual"
+ilastik_data <- read.csv("output_df_ilastik.csv")
+ilastik_data$analysis_type <- "ilastik"
+synquant_data <- read.csv("output_df_synquant_10_12.csv")
+synquant_data$analysis_type <- "synquant"
+#synquant_10_8_data <- read.csv("output_df_synquant_10_8.csv")
+#synquant_10_8_data$analysis_type <- "synquant_10_8"
+
+combined_data <- rbind(manual_data, ilastik_data, synquant_data)
+
+recall_means <- summarize(group_by(combined_data, noise_level, analysis_type), mean(recall)) 
+
+colnames(recall_means) <- c("noise_level", "analysis_type", "recall")
+
+recall_means$sd <- summarize(group_by(combined_data, noise_level, analysis_type), sd(recall))$`sd(recall)`
+
+recall_means$sem <- recall_means$sd/sqrt(length(combined_data$recall))
+
+ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1)
+
+ggplot(data = recall_means, aes(x = noise_level, y = recall)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type))
+
+precision_means <- summarize(group_by(combined_data, noise_level, analysis_type), mean(precision)) 
+
+colnames(precision_means) <- c("noise_level", "analysis_type", "precision")
+
+precision_means$sd <- summarize(group_by(combined_data, noise_level, analysis_type), sd(precision))$`sd(precision)`
+
+precision_means$sem <- precision_means$sd/sqrt(length(combined_data$precision))
+
+ggplot(data = precision_means, aes(x = noise_level, y = precision, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1)
+
+ggplot(data = precision_means, aes(x = noise_level, y = precision)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type))
+
+```
 
