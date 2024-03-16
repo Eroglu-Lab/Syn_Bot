@@ -94,10 +94,10 @@ fixedRedFiles <- c()
 
 for(i in 1:length(redFiles)){
   currentSize <- file.size(redFiles[i])
-  if(currentSize <= 2){
+  if(currentSize <= 4){
     emptyRedList <- c(emptyRedList, redFiles[i])
   }
-  if(currentSize > 2){
+  if(currentSize > 4){
     fixedRedFiles <- c(fixedRedFiles, redFiles[i])
   }
 }
@@ -106,10 +106,10 @@ fixedGreenFiles <- c()
 
 for(i in 1:length(greenFiles)){
   currentSize <- file.size(greenFiles[i])
-  if(currentSize <= 2){
+  if(currentSize <= 4){
     emptyGreenList <- c(emptyGreenList, greenFiles[i])
   }
-  if(currentSize > 2){
+  if(currentSize > 4){
     fixedGreenFiles <- c(fixedGreenFiles, greenFiles[i])
   }
 }
@@ -118,10 +118,10 @@ fixedColocFiles <- c()
 
 for(i in 1:length(colocFiles)){
   currentSize <- file.size(colocFiles[i])
-  if(currentSize <= 2){
+  if(currentSize <= 4){
     emptyColocList <- c(emptyColocList, colocFiles[i])
   }
-  if(currentSize > 2){
+  if(currentSize > 4){
     fixedColocFiles <- c(fixedColocFiles, colocFiles[i])
   }
 }
@@ -221,13 +221,17 @@ for(m in 1:length(colocDataIn)){
 #add in empty images
 empty_colocs_df <- data.frame(emptyColocList)
 
-colnames(empty_colocs_df) <- c("image")
-empty_colocs_df$true_pos_count <- 0
-empty_colocs_df$false_pos_count <- 0
-empty_colocs_df$false_neg_count <- length(true_colocs$coord_string)
-empty_colocs_df$true_neg_count <- 0
+if(length(emptyColocList) > 0){
 
-output_df <- rbind(output_df, empty_colocs_df)
+  colnames(empty_colocs_df) <- c("image")
+  empty_colocs_df$true_pos_count <- 0
+  empty_colocs_df$false_pos_count <- 0
+  empty_colocs_df$false_neg_count <- length(true_colocs$coord_string)
+  empty_colocs_df$true_neg_count <- 0
+  
+  output_df <- rbind(output_df, empty_colocs_df)
+
+}
 
 output_df$recall <- output_df$true_pos_count/(output_df$true_pos_count+output_df$false_neg_count)
 
@@ -308,14 +312,14 @@ output_df$noise_level <- factor(output_df$noise_level, levels = c("0.00", "0.25"
 
 output_df$image_id <- seq.int(nrow(output_df))
 
-#write.csv(output_df, "output_df.csv")
+#write.csv(output_df, "output_df_ilastik.csv")
 
 ```
 
 
 ```{r plot read from file}
 
-output_df <- read.csv("output_df.csv", header = TRUE)
+output_df <- read.csv("output_df_ilastik.csv", header = TRUE)
 
 recall_means <- summarize(group_by(output_df, noise_level), mean(recall)) 
 
