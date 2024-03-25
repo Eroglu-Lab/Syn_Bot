@@ -29,6 +29,7 @@ if("tidyverse" %in% rownames(installed.packages()) == FALSE)
 {install.packages("tidyverse")}
 library(tidyverse)
 library(ggplot2)
+library(DescTools)
 
 ```
 
@@ -366,7 +367,9 @@ recall_means$sd <- summarize(group_by(combined_data, noise_level, analysis_type)
 
 recall_means$sem <- recall_means$sd/sqrt(length(combined_data$recall))
 
-ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level") + ylab("recall frac(TP/(TP+FN))")
+#ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level") + ylab(expression(paste("recall  ", frac("TP", "TP + FP"))))
+
+ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level") + ylab("recall")
 
 #ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_0_simulated_data/synbot_recall.pdf", width = 5, height = 2.75)
 
