@@ -104,7 +104,7 @@ combined_data <- rbind(combined_data, synquant_data)
 
 model_1 <- aov(Colocalized.Puncta.Count ~ analysis_type, combined_data)
 
-summary(anova(model_1))
+summary(model_1)
 
 
 ```

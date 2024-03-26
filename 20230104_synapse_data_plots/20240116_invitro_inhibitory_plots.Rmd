@@ -350,20 +350,20 @@ tukey_1
 ```{r repeated measures plot}
 
 gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Red.Puncta.Count))
-gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Red.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Gephyrin (Red) Puncta Count")
+gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Red.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Gephyrin (Red) Puncta Count") +  theme(axis.text = element_text(size = 6))
 
-#ggsave("F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_s1_line_plots/invitro_inhibitory_red_line_plot_raw.pdf", width = 5, height = 2.75)
+#ggsave("F:/Savage_Dropbox/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20240318_figures/figure_s1_line_plots/invitro_inhibitory_red_line_plot_raw.pdf", width = 5, height = 2.75)
 
 gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Green.Puncta.Count))
-gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Green.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Bassoon (Green) Puncta Count")
+gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Green.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Bassoon (Green) Puncta Count") +  theme(axis.text = element_text(size = 6))
 
-#ggsave("F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_s1_line_plots/invitro_inhibitory_green_line_plot_raw.pdf", width = 5, height = 2.75)
+#ggsave("F:/Savage_Dropbox/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20240318_figures/figure_s1_line_plots/invitro_inhibitory_green_line_plot_raw.pdf", width = 5, height = 2.75)
 
 gg.base <- ggplot(combined_data, aes(x = analysis_type, y = Colocalized.Puncta.Count))
-gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Colocalized.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Colocalized Puncta Count")
+gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(aes(group = image_id, shape = condition)) + stat_summary(mapping = aes(x = analysis_type, y = Colocalized.Puncta.Count), fill = NA , geom = 'col', fun.y = 'mean', color = 'black') + scale_color_viridis_b() + facet_grid(cols = vars(condition))+ scale_x_discrete(labels=c('puncta \n analyzer', 'manual \n synbot', 'ilastik')) + ylab("Colocalized Puncta Count") +  theme(axis.text = element_text(size = 6))
 
 
-#ggsave("F:/Savage_Dropbox/Dropbox (Duke Research Team)/Team_Syn_Bot/20230103_figures/figure_s1_line_plots/invitro_inhibitory_coloc_line_plot_raw.pdf", width = 5, height = 2.75)
+#ggsave("F:/Savage_Dropbox/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20240318_figures/figure_s1_line_plots/invitro_inhibitory_coloc_line_plot_raw.pdf", width = 5, height = 2.75)
 
 
 ```
@@ -372,6 +372,21 @@ gg.base + geom_line(aes(group = image_id, linetype = condition)) + geom_point(ae
 
 
 ```{r test for differences across analysis method}
+
+print("ANOVA of normalized data by analysis type")
+analysis_anova <- aov(normalized_count~analysis_type, data = combined_data)
+summary(analysis_anova)
+
+analysis_tukey <- TukeyHSD(analysis_anova)
+analysis_tukey
+
+print("ANOVA of raw data by analysis type")
+
+raw_analysis_anova <- aov(Colocalized.Puncta.Count~analysis_type, data = combined_data)
+summary(raw_analysis_anova)
+
+raw_analysis_tukey <- TukeyHSD(raw_analysis_anova)
+raw_analysis_tukey
 
 model_1 <- aov(normalized_count~analysis_type+condition, data = combined_data)
 summary(model_1)
