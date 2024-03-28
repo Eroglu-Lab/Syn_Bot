@@ -373,9 +373,9 @@ ggplot(data = recall_means, aes(x = noise_level, y = recall, color = analysis_ty
 
 #ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_0_simulated_data/synbot_recall.pdf", width = 5, height = 2.75)
 
-ggplot(data = recall_means, aes(x = noise_level, y = recall)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type))
+#ggplot(data = recall_means, aes(x = noise_level, y = recall)) + geom_line() + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type))
 
-ggplot(data = recall_means, aes(x = analysis_type, y = recall)) + geom_point(size = 1) + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(noise_level))
+#ggplot(data = recall_means, aes(x = analysis_type, y = recall)) + geom_point(size = 1) + geom_errorbar(aes(ymin=recall-sem, ymax=recall+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(noise_level))
 
 precision_means <- summarize(group_by(combined_data, noise_level, analysis_type), mean(precision)) 
 
@@ -385,13 +385,133 @@ precision_means$sd <- summarize(group_by(combined_data, noise_level, analysis_ty
 
 precision_means$sem <- precision_means$sd/sqrt(length(combined_data$precision))
 
-ggplot(data = precision_means, aes(x = noise_level, y = precision, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level") + ylab(paste("precision ", frac(TP/(TP+FP))))
+ggplot(data = precision_means, aes(x = noise_level, y = precision, color = analysis_type)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) +scale_color_ordinal(name = "Thresholding Method") + xlab("noise level") + ylab("precision")
 
 #ggsave("C:/Users/savag/Duke Research Team Dropbox/Justin Savage/Team_Syn_Bot/20230103_figures/figure_0_simulated_data/synbot_precision.pdf", width = 5, height = 2.75)
 
-ggplot(data = precision_means, aes(x = noise_level, y = precision)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type)) 
+#ggplot(data = precision_means, aes(x = noise_level, y = precision)) + geom_line() + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(analysis_type)) 
 
-ggplot(data = precision_means, aes(x = analysis_type, y = precision)) + geom_point(size = 1) + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(noise_level)) 
+#ggplot(data = precision_means, aes(x = analysis_type, y = precision)) + geom_point(size = 1) + geom_errorbar(aes(ymin=precision-sem, ymax=precision+sem), width=.1) + ylim(0, 1) + facet_grid(cols = vars(noise_level)) 
 
 ```
+
+
+
+```{r stats on recall}
+
+print("ANOVA of recall by analysis type")
+analysis_anova <- aov(recall~analysis_type, data = combined_data)
+summary(analysis_anova)
+
+analysis_tukey <- TukeyHSD(analysis_anova)
+analysis_tukey
+
+#make noise level a factor
+combined_data$noise_level <- as.factor(combined_data$noise_level)
+
+print("ANOVA of recall by analysis type and noise level")
+analysis_anova <- aov(recall~analysis_type+noise_level, data = combined_data)
+summary(analysis_anova)
+
+analysis_tukey <- TukeyHSD(analysis_anova)
+analysis_tukey
+
+#Try ANOVA between methods at each noise level
+noise_0_00_data <- filter(combined_data, noise_level == 0.00)
+noise_0_25_data <- filter(combined_data, noise_level == 0.25)
+noise_0_50_data <- filter(combined_data, noise_level == 0.50)
+noise_0_75_data <- filter(combined_data, noise_level == 0.75)
+noise_1_00_data <- filter(combined_data, noise_level == 1.00)
+
+
+noise_0_00_anova <- aov(recall~analysis_type, data = noise_0_00_data)
+summary(noise_0_00_anova)
+
+noise_0_00_anova_tukey <- TukeyHSD(noise_0_00_anova)
+noise_0_00_anova_tukey
+
+noise_0_25_anova <- aov(recall~analysis_type, data = noise_0_25_data)
+summary(noise_0_25_anova)
+
+noise_0_25_anova_tukey <- TukeyHSD(noise_0_25_anova)
+noise_0_25_anova_tukey
+
+noise_0_50_anova <- aov(recall~analysis_type, data = noise_0_50_data)
+summary(noise_0_50_anova)
+
+noise_0_50_anova_tukey <- TukeyHSD(noise_0_50_anova)
+noise_0_50_anova_tukey
+
+noise_0_75_anova <- aov(recall~analysis_type, data = noise_0_75_data)
+summary(noise_0_75_anova)
+
+noise_0_75_anova_tukey <- TukeyHSD(noise_0_75_anova)
+noise_0_75_anova_tukey
+
+noise_1_00_anova <- aov(recall~analysis_type, data = noise_1_00_data)
+summary(noise_0_75_anova)
+
+noise_1_00_anova_tukey <- TukeyHSD(noise_1_00_anova)
+noise_1_00_anova_tukey
+```
+
+
+```{r stats on precision}
+
+print("ANOVA of precision by analysis type")
+analysis_anova <- aov(precision~analysis_type, data = combined_data)
+summary(analysis_anova)
+
+analysis_tukey <- TukeyHSD(analysis_anova)
+analysis_tukey
+
+#make noise level a factor
+combined_data$noise_level <- as.factor(combined_data$noise_level)
+
+print("ANOVA of precision by analysis type and noise level")
+analysis_anova <- aov(precision~analysis_type+noise_level, data = combined_data)
+summary(analysis_anova)
+
+analysis_tukey <- TukeyHSD(analysis_anova)
+analysis_tukey
+
+#Try ANOVA between methods at each noise level
+noise_0_00_data <- filter(combined_data, noise_level == 0.00)
+noise_0_25_data <- filter(combined_data, noise_level == 0.25)
+noise_0_50_data <- filter(combined_data, noise_level == 0.50)
+noise_0_75_data <- filter(combined_data, noise_level == 0.75)
+noise_1_00_data <- filter(combined_data, noise_level == 1.00)
+
+
+noise_0_00_anova <- aov(precision~analysis_type, data = noise_0_00_data)
+summary(noise_0_00_anova)
+
+noise_0_00_anova_tukey <- TukeyHSD(noise_0_00_anova)
+noise_0_00_anova_tukey
+
+noise_0_25_anova <- aov(precision~analysis_type, data = noise_0_25_data)
+summary(noise_0_25_anova)
+
+noise_0_25_anova_tukey <- TukeyHSD(noise_0_25_anova)
+noise_0_25_anova_tukey
+
+noise_0_50_anova <- aov(precision~analysis_type, data = noise_0_50_data)
+summary(noise_0_50_anova)
+
+noise_0_50_anova_tukey <- TukeyHSD(noise_0_50_anova)
+noise_0_50_anova_tukey
+
+noise_0_75_anova <- aov(precision~analysis_type, data = noise_0_75_data)
+summary(noise_0_75_anova)
+
+noise_0_75_anova_tukey <- TukeyHSD(noise_0_75_anova)
+noise_0_75_anova_tukey
+
+noise_1_00_anova <- aov(precision~analysis_type, data = noise_1_00_data)
+summary(noise_0_75_anova)
+
+noise_1_00_anova_tukey <- TukeyHSD(noise_1_00_anova)
+noise_1_00_anova_tukey
+```
+
 
