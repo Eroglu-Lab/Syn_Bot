@@ -419,7 +419,7 @@ var lowerGreenT = newArray(10000);
 var upperGreenT = newArray(10000);
 var imageScale = newArray(10000);
 var imageUnit = newArray(10000);
-var roiSize = newArray(10000);
+var roiArea = newArray(10000);
 var iterator = 0;
 
 //extras for blue channel
@@ -543,7 +543,7 @@ lowerGreenT = Array.trim(lowerGreenT, iterator);
 upperGreenT = Array.trim(upperGreenT, iterator);
 imageScale = Array.trim(imageScale, iterator);
 imageUnit = Array.trim(imageUnit, iterator);
-roiSize = Array.trim(roiSize, iterator);
+roiArea = Array.trim(roiArea, iterator);
 
 if (channelType == "3-Channel Colocalization (RGB)"){
 	blueList = Array.trim(blueList, iterator);
@@ -585,7 +585,7 @@ if (channelType == "3-Channel Colocalization (RGB)"){
 }
 Table.setColumn("Scale", imageScale);
 Table.setColumn("Unit", imageUnit);
-Table.setColumn("roiSize", roiSize);
+Table.setColumn("roiArea", roiArea);
 	
 Table.save(dirSource + "Summary.csv");
 
@@ -1359,13 +1359,13 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		}
 	}
 	
-	//get roiSize if there is one selected
-	currentRoiSize = getValue("Area");
+	//get roiArea if there is one selected
+	currentroiArea = getValue("Area");
 	
 	//if whole image ROI, get area of image
 	if(roiType == "Whole Image"){
 		getDimensions(width, height, channels, slices, frames);
-		currentRoiSize = width * height;
+		currentroiArea = width * height;
 	}
 
 	
@@ -1923,7 +1923,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	upperGreenT[iterator] = greenUpper;
 	imageScale[iterator] = pixelWidth;
 	imageUnit[iterator] = unit;
-	roiSize[iterator] = currentRoiSize;
+	roiArea[iterator] = currentroiArea;
 
 	if (channelType == "3-Channel Colocalization (RGB)"){
 		blueList[iterator] = blueX.length;
