@@ -419,6 +419,7 @@ var lowerGreenT = newArray(10000);
 var upperGreenT = newArray(10000);
 var imageScale = newArray(10000);
 var imageUnit = newArray(10000);
+var roiSize = newArray(10000);
 var iterator = 0;
 
 //extras for blue channel
@@ -542,6 +543,7 @@ lowerGreenT = Array.trim(lowerGreenT, iterator);
 upperGreenT = Array.trim(upperGreenT, iterator);
 imageScale = Array.trim(imageScale, iterator);
 imageUnit = Array.trim(imageUnit, iterator);
+roiSize = Array.trim(roiSize, iterator);
 
 if (channelType == "3-Channel Colocalization (RGB)"){
 	blueList = Array.trim(blueList, iterator);
@@ -583,6 +585,7 @@ if (channelType == "3-Channel Colocalization (RGB)"){
 }
 Table.setColumn("Scale", imageScale);
 Table.setColumn("Unit", imageUnit);
+Table.setColumn("roiSize", roiSize);
 	
 Table.save(dirSource + "Summary.csv");
 
@@ -670,7 +673,6 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	
 	
 	//Analyze red puncta
-	//The subtract background and Gaussian blur filters are applied 
 	selectWindow(title + " (red)");
 	splitName = split(titleTemp, ".");
 	print("splitName is " + splitName[0]);
@@ -983,6 +985,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 
 	//setBatchMode("exit and display");
 	//waitForUser("before analyze particles");
+	
 	
 	//open roiManager
 	run("ROI Manager...");
@@ -1354,6 +1357,15 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		else {
 			makeRectangle(roiX - (roiWidth/2.0), roiY - (roiWidth/2.0), roiWidth, roiWidth);
 		}
+	}
+	
+	//get roiSize if there is one selected
+	currentRoiSize = getValue("Area");
+	
+	//if whole image ROI, get area of image
+	if(roiType == "Whole Image"){
+		getDimensions(width, height, channels, slices, frames);
+		currentRoiSize = width * height;
 	}
 
 	
@@ -1911,6 +1923,7 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	upperGreenT[iterator] = greenUpper;
 	imageScale[iterator] = pixelWidth;
 	imageUnit[iterator] = unit;
+	roiSize[iterator] = currentRoiSize;
 
 	if (channelType == "3-Channel Colocalization (RGB)"){
 		blueList[iterator] = blueX.length;
