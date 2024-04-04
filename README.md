@@ -15,7 +15,7 @@ The primary components of analyzing these sorts of images include:
 
 ## Compatibility
 
-SynBot was developed for use with the FIJI on the Windows operating system. It is recommended to run SynBot on a Windows computer when possible, particularly when using more advanced features. In particular, we have found ilastik to be unstable on Mac computers when a new version of MacOS is used. Mac users should consult the [ilastik.org](https://www.ilastik.org/) webpage to make sure their versions of ilastik and MacOS are compatible.
+SynBot was developed for use with FIJI on the Windows operating system. It is recommended to run SynBot on a Windows computer when possible, particularly when using more advanced features. In particular, we have found ilastik to be unstable on Mac computers when a new version of MacOS is used. Mac users should consult the [ilastik.org](https://www.ilastik.org/) webpage to make sure their versions of ilastik and MacOS are compatible.
 
 ## Installation
 
