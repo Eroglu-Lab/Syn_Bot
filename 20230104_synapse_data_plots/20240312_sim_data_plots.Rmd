@@ -15,7 +15,6 @@ library(agricolae)
 library(ggsignif)
 library(multcomp)
 library(nlme)
-library(DescTools)
 ```
 
 
@@ -104,7 +103,7 @@ combined_data <- rbind(combined_data, synquant_data)
 
 model_1 <- aov(Colocalized.Puncta.Count ~ analysis_type, combined_data)
 
-summary(model_1)
+summary(anova(model_1))
 
 
 ```
