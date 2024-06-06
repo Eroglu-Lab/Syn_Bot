@@ -501,11 +501,11 @@ for(m = 0; m < listSource.length; m++){
 		}
 	}
 
-	//list of processed images in z_projects
-	listZ = getFileList(dirOut);
+	//list of processed images in Output folder
+	listOut = getFileList(dirOut);
 	//for each image in dirOut
-	for(i = 0; i < listZ.length; i++){
-		currentImage = listZ[i];
+	for(i = 0; i < listOut.length; i++){
+		currentImage = listOut[i];
 		//for each threshold offset in listOffset
 		for(j = 0; j < listOffset.length; j++){
 	
@@ -2256,8 +2256,8 @@ function percentThreshold(percentIncluded){
 	
 
 //Z projects images by getting the Max Intensity projections of every
-//3 Z-stacks and converting the projection to RGB before saving
-function zProject(dir1, dir2, file) {
+//numStacks Z-stacks and converting the projection to RGB before saving
+function zProject(dir1, dir2, file, numStacks) {
 	setBatchMode(true);
 	//use Bio-Formats open if image is not already a tif
 	
@@ -2274,16 +2274,16 @@ function zProject(dir1, dir2, file) {
 		print("non-tif detected");
 	}
 	Stack.getDimensions(width, height, channels, slices, frames);
-	num = floor(slices / 3);
+	num = floor(slices / numStacks);
 
 	for (j = 1; j <= num; j++) {
-		end = j * 3;
-		start = end - 2;
+		end = j * numStacks;
+		start = end - (numStacks - 1);
 		run("Z Project...", "start=" + j + " stop=" + end + " projection=[Max Intensity]");
 		run("Channels Tool...");
 		Stack.setDisplayMode("composite");
 		run("Stack to RGB");
-		saveAs("tiff", dir2 + substring(file,0,lengthOf(file)-4) + "-" +j);
+		saveAs("tiff", dir2 + File.getNameWithoutExtension(dir1+file) + "-" +j);
 		close();
 		close();
 	}
@@ -2295,6 +2295,13 @@ function zProject(dir1, dir2, file) {
 
 //Runs the Z-Projection for all of the images in a directory
 function projectPair(dir1, dirOut) {
+
+	Dialog.create("Z-stack images detected");
+	Dialog.addMessage("Z-stack images detected \n How would you like to max project these images?");
+	Dialog.addNumber("Number of Stacks per preojection", 3);
+	Dialog.addMessage("Hint: enter 1 stack per projection to analyze each stack separately");
+	Dialog.show();
+	numStacks = Dialog.getNumber();
 
 	list  = getFileList(dir1);
 	setBatchMode(true);
@@ -2310,7 +2317,7 @@ function projectPair(dir1, dirOut) {
 		if(endsWith(list[i], ".lif")){
 			continue;
 		}
-		zProject(dir1, dirOut, list[i]);
+		zProject(dir1, dirOut, list[i], numStacks);
 	}
 }
 
