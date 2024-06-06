@@ -3,7 +3,7 @@
  *  Justin Savage
  *  Juan Ramirez
  *  Yizhi Wang
- *  3/4/24
+ *  6/6/24
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  SynQuant functionality depends on the SynQuantExtra plugin
@@ -227,6 +227,16 @@ if (fromFileBool == true){
 	close(tableName);
 }
 
+if(noiseBool == true){
+	Dialog.create("Noise Reduction Parameters");
+	Dialog.addMessage("Noise Reduction Parameters");
+	Dialog.addNumber("Subtract Background Rolling Ball Radius", 50);
+	Dialog.addNumber("Gaussian Blur Sigma", 0.57);
+	Dialog.show();
+		
+	subtractNum = Dialog.getNumber();
+	gaussNum = Dialog.getNumber();
+}
 
 if (threshType == "Fixed Value"){
 	Dialog.create("Fixed Threshold Value");
@@ -689,10 +699,9 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	}
 	
 	if (noiseBool == true){
-		run("Subtract Background...", "rolling=50");
-		//Nicola Allen's Lab uses the same Gaussian Blur
-		//for their puncta analysis
-		run("Gaussian Blur...", "sigma=0.57");
+	
+		run("Subtract Background...", "rolling=" + subtractNum);
+		run("Gaussian Blur...", "sigma=" + gaussNum);
 	}
 
 	
@@ -1084,10 +1093,12 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	//Analyze green puncta
 	//The subtract background and Gaussian blur filters are applied
 	selectWindow(title + " (green)");
-	if(noiseBool == true){
-		run("Subtract Background...", "rolling=50");
-		run("Gaussian Blur...", "sigma=0.57");
+	if (noiseBool == true){
+	
+		run("Subtract Background...", "rolling=" + subtractNum);
+		run("Gaussian Blur...", "sigma=" + gaussNum);
 	}
+
 
 	if (brightBool == true){
 		run("Enhance Contrast...", "saturated="+brightPercent+" equalize");
@@ -1457,10 +1468,12 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 		//Analyze blue puncta
 		//The subtract background and Gaussian blur filters are applied
 		selectWindow(title + " (blue)");
-		if(noiseBool == true){
-			run("Subtract Background...", "rolling=50");
-			run("Gaussian Blur...", "sigma=0.57");
+		if (noiseBool == true){
+		
+			run("Subtract Background...", "rolling=" + subtractNum);
+			run("Gaussian Blur...", "sigma=" + gaussNum);
 		}
+
 	
 		if (brightBool == true){
 			run("Enhance Contrast...", "saturated="+brightPercent+" equalize");
