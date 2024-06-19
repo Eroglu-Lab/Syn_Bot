@@ -79,6 +79,8 @@ for(i in 1:length(imageFiles)) {
   }
 }
 
+getwd()
+
 #redFiles and greenFiles stores the names of images
 redFiles <- str_subset(fileList, pattern = 'redResults')
 greenFiles <- str_subset(fileList, pattern = 'greenResults')

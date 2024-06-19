@@ -1,0 +1,457 @@
+---
+title: "20240408_synbot_puncta_processor"
+author: "Justin Savage"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r load libraries}
+#author Justin Savage
+#js664@duke.edu
+#Version 1.0
+#8/16/21
+
+#This script is for combining the data from the coloc_results file output of the 
+# Syn_Bot ImageJ Macro. You should be able to simply select the entire script (Ctrl/Cmnd + A)
+# and click the Run button in the top right corner. You will then select the same folder
+# that was selected for the Syn_Bot run. This will read in the data and write a 
+# summary.csv file similar to the one that is made by Syn_Bot itself.
+
+#Further analysis can be performed on the data from individual images using similar 
+# techniques to those shown here. Those unfamiliar with R are encouraged to learn 
+# more about it at https://r4ds.had.co.nz/
+
+#loaded RStudioAPI to use for selecting working directory
+if("rstudioapi" %in% rownames(installed.packages()) == FALSE) 
+{install.packages("rstudioapi")}
+library(rstudioapi)
+if("xlsx" %in% rownames(installed.packages()) == FALSE) 
+{install.packages("xlsx")}
+library(xlsx)
+if("reshape" %in% rownames(installed.packages()) == FALSE) 
+{install.packages("reshape")}
+library(reshape)
+if("data.table" %in% rownames(installed.packages()) == FALSE) 
+{install.packages("data.table")}
+library(data.table)
+if("stringi" %in% rownames(installed.packages()) == FALSE) 
+{install.packages("stringi")}
+library(stringi)
+if("tidyverse" %in% rownames(installed.packages()) == FALSE) 
+{install.packages("tidyverse")}
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r load data}
+
+dataFile <- selectDirectory(
+  caption = "Select Directory",
+  label = "Select",
+  path = getActiveProject()
+)
+setwd(dataFile)
+
+
+allFiles <- dir()
+imageIndices <- 0
+
+for (i in 1:length(allFiles)){
+  currentFile <- allFiles[i]
+    imageIndices <- append(imageIndices, i)
+}
+
+
+for(i in 2:length(imageIndices)){
+  if(i == 2){
+    imageFiles <- allFiles[imageIndices[i]]
+  }
+  if(i != 2){
+    imageFiles <- append(imageFiles, allFiles[imageIndices[i]])
+  }
+}
+
+#imageFiles is all folders that aren't the key
+for(i in 1:length(imageFiles)) {
+  currentFile <- imageFiles[i]
+  pathOutput <- paste(currentFile, 'Output', sep = "/")
+  if (i == 1) {
+    fileList <- dir(pathOutput)
+    for(j in 1:length(fileList)){
+      fileList[j] <- paste(pathOutput, fileList[j], sep = "/")
+    }
+  }
+  if (i != 1) {
+    newFiles <- dir(pathOutput)
+    for(j in 1:length(newFiles)){
+      newFiles[j] <- paste(pathOutput, newFiles[j], sep = "/")
+    }
+    fileList <- append(fileList, newFiles)
+  }
+}
+
+getwd()
+
+#redFiles and greenFiles stores the names of images
+redFiles <- str_subset(fileList, pattern = 'redResults')
+greenFiles <- str_subset(fileList, pattern = 'greenResults')
+colocFiles <- str_subset(fileList, pattern = 'colocResults')
+redDataIn <- lapply(redFiles, read.csv)
+greenDataIn <- lapply(greenFiles, read.csv)
+colocDataIn <- lapply(colocFiles, read.csv)
+
+```
+
+
+```{r count puncta}
+
+for (i in 1:length(redDataIn)){
+  currentData <- redDataIn[[i]]
+  #Removes all columns but puncta number, Area, X, Y
+  redDataIn[[i]] <- currentData[,c(2,3,6,7)]
+  redDataIn[[i]]$Image <- i
+  setorder(redDataIn[[i]],Image,X)
+}
+
+for (i in 1:length(greenDataIn)){
+  currentData <- greenDataIn[[i]]
+  #Removes all columns but puncta number, Area, X, Y
+  greenDataIn[[i]] <- currentData[,c(2,3,6,7)]
+  greenDataIn[[i]]$Image <- i
+  setorder(greenDataIn[[i]],Image,X)
+}
+
+for (i in 1:length(colocDataIn)){
+  currentData <- colocDataIn[i]
+  colocDataIn[[i]]$Image <- i
+  setorder(colocDataIn[[i]],Image,X)
+}
+
+for (i in 1:length(colocDataIn)) {
+  currentColocData <- colocDataIn[[i]]
+  colocTot <- length(currentColocData$X)
+  if (i == 1){
+    colocVector <- c(colocTot)
+  }
+  if (i != 1){
+    colocVector <- append(colocVector, colocTot)
+  }
+}
+
+# #not working, probably because not every image has colocs
+
+
+# colocData <- tibble(
+#   Image = redFiles,
+#   ColocCount = colocVector
+# )
+# 
+# #also count red puncta 
+# 
+# for (i in 1:length(redDataIn)) {
+#   currentRedData <- redDataIn[[i]]
+#   redTot <- length(currentRedData$X)
+#   if (i == 1){
+#     redVector <- c(redTot)
+#   }
+#   if (i != 1){
+#     redVector <- append(redVector, redTot)
+#   }
+# }
+# 
+# colocData <- colocData %>% add_column(RedCount = redVector)
+# colocData$RedCount = redVector
+# 
+# 
+# #also count green puncta
+# 
+# for (i in 1:length(greenDataIn)) {
+#   currentGreenData <- greenDataIn[[i]]
+#   greenTot <- length(currentGreenData$X)
+#   if (i == 1){
+#     greenVector <- c(greenTot)
+#   }
+#   if (i != 1){
+#     greenVector <- append(greenVector, greenTot)
+#   }
+# }
+# 
+# colocData <- colocData %>% add_column(GreenCount = greenVector)
+# colocData$GreenCount = greenVector
+#write.csv(colocData, file="summary.csv")
+
+GScount <- 0
+WTcount <- 0
+#get red puncta area by condition
+for (i  in 1:length(redFiles)){
+  currentImage <- redFiles[i]
+  currentAreas <- redDataIn[[i]]$Area
+  if (grepl("GS", currentImage)){
+    currentCondition <- "GS"
+    if (GScount == 0){
+      redAreaVector_GS <- currentAreas
+    }
+    if (GScount > 0){
+      redAreaVector_GS <- append(redAreaVector_GS, currentAreas)
+    }
+    GScount <- GScount + 1
+  }
+  else{
+    currentCondition <- "WT"
+    if (WTcount == 0){
+      redAreaVector_WT <- currentAreas
+    }
+    if (WTcount > 0){
+      redAreaVector_WT <- append(redAreaVector_WT, currentAreas)
+    }
+    WTcount <- WTcount + 1
+  }
+}
+
+redArea_GS.df <- data.frame(redAreaVector_GS)
+colnames(redArea_GS.df) <- c("area")
+redArea_WT.df <- data.frame(redAreaVector_WT)
+colnames(redArea_WT.df) <- c("area")
+```
+
+
+```{r plots}
+
+ggplot(data = redArea_GS.df) + geom_histogram(aes(x = area), binwidth = 5) 
+ggplot(data = redArea_WT.df) + geom_histogram(aes(x = area), binwidth = 5)
+
+ggplot(data = redArea_GS.df) + geom_density(aes(x = area)) 
+ggplot(data = redArea_WT.df) + geom_density(aes(x = area))
+
+ggplot(data = redArea_GS.df) + geom_density(aes(x = area), fill = "magenta") + geom_density(data = redArea_WT.df, aes(x = area), fill = "red")
+```
+
+```{r green puncta area}
+GScount <- 0
+WTcount <- 0
+#get green puncta area by condition
+for (i  in 1:length(greenFiles)){
+  currentImage <- greenFiles[i]
+  currentAreas <- greenDataIn[[i]]$Area
+  if (grepl("GS", currentImage)){
+    currentCondition <- "GS"
+    if (GScount == 0){
+      greenAreaVector_GS <- currentAreas
+    }
+    if (GScount > 0){
+      greenAreaVector_GS <- append(greenAreaVector_GS, currentAreas)
+    }
+    GScount <- GScount + 1
+  }
+  else{
+    currentCondition <- "WT"
+    if (WTcount == 0){
+      greenAreaVector_WT <- currentAreas
+    }
+    if (WTcount > 0){
+      greenAreaVector_WT <- append(greenAreaVector_WT, currentAreas)
+    }
+    WTcount <- WTcount + 1
+  }
+}
+
+greenArea_GS.df <- data.frame(greenAreaVector_GS)
+colnames(greenArea_GS.df) <- c("area")
+greenArea_WT.df <- data.frame(greenAreaVector_WT)
+colnames(greenArea_WT.df) <- c("area")
+
+
+ggplot(data = greenArea_GS.df) + geom_histogram(aes(x = area), binwidth = 5) 
+ggplot(data = greenArea_WT.df) + geom_histogram(aes(x = area), binwidth = 5)
+
+ggplot(data = greenArea_GS.df) + geom_density(aes(x = area)) 
+ggplot(data = greenArea_WT.df) + geom_density(aes(x = area))
+
+ggplot(data = greenArea_GS.df) + geom_density(aes(x = area), fill = "magenta") + geom_density(data = greenArea_WT.df, aes(x = area), fill = "red")
+```
+
+```{r coloc puncta area}
+GScount <- 0
+WTcount <- 0
+#get coloc puncta area by condition
+for (i  in 1:length(colocFiles)){
+  currentImage <- colocFiles[i]
+  currentAreas <- colocDataIn[[i]]$Area
+  if (grepl("GS", currentImage)){
+    currentCondition <- "GS"
+    if (GScount == 0){
+      colocAreaVector_GS <- currentAreas
+    }
+    if (GScount > 0){
+      colocAreaVector_GS <- append(colocAreaVector_GS, currentAreas)
+    }
+    GScount <- GScount + 1
+  }
+  else{
+    currentCondition <- "WT"
+    if (WTcount == 0){
+      colocAreaVector_WT <- currentAreas
+    }
+    if (WTcount > 0){
+      colocAreaVector_WT <- append(colocAreaVector_WT, currentAreas)
+    }
+    WTcount <- WTcount + 1
+  }
+}
+
+colocArea_GS.df <- data.frame(colocAreaVector_GS)
+colnames(colocArea_GS.df) <- c("area")
+colocArea_WT.df <- data.frame(colocAreaVector_WT)
+colnames(colocArea_WT.df) <- c("area")
+
+colocArea_GS.df$genotype <- "GS"
+colocArea_WT.df$genotype <- "WT"
+
+
+ggplot(data = colocArea_GS.df) + geom_histogram(aes(x = area), binwidth = 5) 
+ggplot(data = colocArea_WT.df) + geom_histogram(aes(x = area), binwidth = 5)
+
+ggplot(data = colocArea_GS.df) + geom_density(aes(x = area)) 
+ggplot(data = colocArea_WT.df) + geom_density(aes(x = area))
+
+ggplot(data = colocArea_GS.df) + geom_density(aes(x = area, fill = genotype)) + geom_density(data = colocArea_WT.df, aes(x = area, fill = genotype)) + annotate("text", x = 40, y = 0.04, label = "p=0.060")
+```
+
+
+```{r stats}
+
+colocArea_GS.df$genotype <- "GS"
+colocArea_WT.df$genotype <- "WT"
+
+colocArea_combined.df <- rbind(colocArea_GS.df, colocArea_WT.df) 
+
+t.test(area ~ genotype, colocArea_combined.df)
+
+```
+
+```{r add image labels}
+
+currentData <- redDataIn[[1]]
+
+currentData$Image <- redFiles[1]
+
+mergedRedData <- currentData
+
+
+
+for (i in 2:length(redDataIn)){
+  
+  currentData <- redDataIn[[i]]
+  
+  currentData$Image <- redFiles[i]
+  
+  mergedRedData <- rbind(mergedRedData, currentData)
+  
+}
+
+#write.csv(mergedRedData, "F:/GitHub/20240215_shiyi_analysis/20240410_lc3b_puncta_area.csv")
+
+
+currentData <- greenDataIn[[1]]
+
+currentData$Image <- greenFiles[1]
+
+mergedGreenData <- currentData
+
+
+
+for (i in 2:length(greenDataIn)){
+  
+  currentData <- greenDataIn[[i]]
+  
+  currentData$Image <- greenFiles[i]
+  
+  mergedGreenData <- rbind(mergedGreenData, currentData)
+  
+}
+
+#write.csv(mergedGreenData, "F:/GitHub/20240215_shiyi_analysis/20240410_p62_puncta_area.csv")
+
+#TODO: don't account for cells with no colocs
+
+currentData <- colocDataIn[[1]]
+
+currentData$Image <- colocFiles[1]
+
+mergedColocData <- currentData
+
+
+
+for (i in 2:length(colocDataIn)){
+  
+  currentData <- colocDataIn[[i]]
+  
+  currentData$Image <- colocFiles[i]
+  
+  mergedColocData <- rbind(mergedColocData, currentData)
+  
+}
+
+#write.csv(mergedColocData, "F:/GitHub/20240215_shiyi_analysis/20240410_lc3b_p62_colocalized_puncta_area.csv")
+
+```
+
+
+
+```{r label conditions}
+
+colocDataIn <- read.csv("F:/GitHub/20240215_shiyi_analysis/20240410_lc3b_p62_colocalized_puncta_area.csv")
+
+#initialize genotype
+lc3_data_in$genotype <- "blank"
+
+#label data with experimental condition
+lc3_data_in[which(grepl("WT", lc3_data_in$Image)),]$genotype <- "WT"
+lc3_data_in[which(grepl("GS", lc3_data_in$Image)),]$genotype <- "GS"
+
+#make genotype a factor so that it always plots in WT then GS order
+lc3_data_in$genotype <- factor(lc3_data_in$genotype, levels = c("WT", "GS"))
+
+lc3_data_in$cell <- -99
+cell_num <- 1
+
+#start with first cell
+previous_cell <- str_split(lc3_data_in$Image[1], "-")[[1]][2]
+
+#average the z_stacks for each cell
+for (i in 1:length(lc3_data_in$Image)) {
+  
+  current_cell <- str_split(lc3_data_in$Image[i], "-")[[1]][2]
+  if(current_cell == previous_cell){
+    lc3_data_in$cell[i] <- cell_num
+  }
+  if(current_cell != previous_cell){
+    cell_num <- cell_num + 1
+    lc3_data_in$cell[i] <- cell_num
+    previous_cell <- current_cell
+  }
+  i <- i + 1
+}
+
+lc3_data_cell_avg_colocs <- summarize(group_by(lc3_data_in, genotype, cell), mean(Colocalized.Puncta.Count))
+
+lc3_data_cell_avg_red <- summarize(group_by(lc3_data_in, genotype, cell), mean(Red.Puncta.Count))
+
+lc3_data_cell_avg_green <- summarize(group_by(lc3_data_in, genotype, cell), mean(Green.Puncta.Count))
+
+
+
+```
+
+
+
+
+
+
