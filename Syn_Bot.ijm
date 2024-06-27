@@ -2310,7 +2310,7 @@ function zProject(dir1, dir2, file, numStacks) {
 		if(bitDepth() != 24 && slices2 == 1){
 			run("RGB Color");
 		}
-		saveAs("tiff", dir2 + File.getNameWithoutExtension(dir1+file) + "-" +j);
+		saveAs("tiff", dir2 + File.getNameWithoutExtension(dir1+file) + "_" + start + "-" + end);
 		//close all images except to original stack
 		selectWindow(stack_image);
 		close("\\Others");
