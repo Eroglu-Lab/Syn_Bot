@@ -2286,22 +2286,37 @@ function zProject(dir1, dir2, file, numStacks) {
 		run("Bio-Formats Importer", "open=["+dir1+file+"] color_mode=Composite rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
 		print("non-tif detected");
 	}
+	
+	stack_image = getTitle();
+	
 	Stack.getDimensions(width, height, channels, slices, frames);
 	num = floor(slices / numStacks);
 
-	for (j = 1; j <= num; j++) {
-		end = j * numStacks;
-		start = end - (numStacks - 1);
+	for (j = 1; j <= slices; j = j + numStacks) {
+		end = j + numStacks - 1;
+		start = j;
 		run("Z Project...", "start=" + j + " stop=" + end + " projection=[Max Intensity]");
 		run("Channels Tool...");
-		Stack.setDisplayMode("composite");
-		run("Stack to RGB");
+		Stack.getDimensions(width2, height2, channels2, slices2, frames2);
+		if(is("composite") == false && slices2 > 1){
+			Stack.setDisplayMode("composite");
+		}
+		if(is("composite") == false && slices2 == 1){
+			run("Make Composite");
+		}
+		if(bitDepth() != 24 && slices2 > 1){
+			run("Stack to RGB");
+		}
+		if(bitDepth() != 24 && slices2 == 1){
+			run("RGB Color");
+		}
 		saveAs("tiff", dir2 + File.getNameWithoutExtension(dir1+file) + "-" +j);
-		close();
-		close();
+		//close all images except to original stack
+		selectWindow(stack_image);
+		close("\\Others");
 	}
 
-	close();
+	close(stack_image);
 	selectWindow("Channels");
 	run("Close");
 }
