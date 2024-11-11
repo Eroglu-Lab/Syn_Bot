@@ -1,7 +1,7 @@
 # Syn_Bot
 ## FIJI Syn_Bot Macro
 
-This macro was developed by [Cagla Eroglu's Lab at Duke University](https://sites.duke.edu/eroglulab/) to count the number of colocalized synaptic puncta in fluorescence microscopy images. The macro and related experimental methods are thoroughly described in our [BioRxiv paper](https://www.biorxiv.org/content/10.1101/2023.06.26.546578v1).
+This macro was developed by [Cagla Eroglu's Lab at Duke University](https://sites.duke.edu/eroglulab/) to count the number of colocalized synaptic puncta in fluorescence microscopy images. The macro and related experimental methods are thoroughly described in [Savage et al., 2024 Cell Reports Methods](https://www.cell.com/cell-reports-methods/fulltext/S2667-2375(24)00239-X).
 
 There are also tutorials for using SynBot and relevant synaptic staining protocols on our [Eroglu Lab protocols.io workspace](https://www.protocols.io/view/synbot-protocols-3byl4qewjvo5/v1).
 
