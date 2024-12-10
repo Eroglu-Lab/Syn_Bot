@@ -513,6 +513,8 @@ for(m = 0; m < listSource.length; m++){
 
 	//list of processed images in Output folder
 	listOut = getFileList(dirOut);
+	//sort the filenames so that it will always go in the same order
+	listOut = Array.sort(listOut);
 	//for each image in dirOut
 	for(i = 0; i < listOut.length; i++){
 		currentImage = listOut[i];
@@ -527,7 +529,6 @@ for(m = 0; m < listSource.length; m++){
 			//analyzePuncta(dirOut + currentImage, dirOut, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, imageList, redList, greenList, blueList, colocList, offsetUsed, lowerRedT, upperRedT, lowerGreenT, upperGreenT, lowerBlueT, upperBlueT, iterator, imageScale, imageUnit, ilpRedDir, ilpGreenDir, ilpBlueDir);
 			analyzePuncta(dirOut + currentImage, dirOut, currentOffset, redMinPixel, greenMinPixel, blueMinPixel, roiType, ilpRedDir, ilpGreenDir, ilpBlueDir);
 
-			//TODO: get weird ilastik exception windows to close
 			//close any weird exception windows if they exist
 			if(isOpen("Exception")){
 				selectWindow("Exception");
@@ -539,7 +540,7 @@ for(m = 0; m < listSource.length; m++){
 			iterator = iterator + 1;	
 		}
 	}
-
+}
 
 //Removes empty indices from arrays
 imageList = Array.trim(imageList, iterator);
