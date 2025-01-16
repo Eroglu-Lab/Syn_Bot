@@ -3,7 +3,7 @@
  *  Justin Savage
  *  Juan Ramirez
  *  Yizhi Wang
- *  6/6/24
+ *  1/16/25
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  SynQuant functionality depends on the SynQuantExtra plugin
@@ -2296,6 +2296,10 @@ function zProject(dir1, dir2, file, numStacks) {
 	for (j = 1; j <= slices; j = j + numStacks) {
 		end = j + numStacks - 1;
 		start = j;
+		//if you have extra stacks that can't be projected into a numStacks thich projection, stop projecting
+		if(end > slices){
+			break;
+		}
 		run("Z Project...", "start=" + j + " stop=" + end + " projection=[Max Intensity]");
 		run("Channels Tool...");
 		Stack.getDimensions(width2, height2, channels2, slices2, frames2);
@@ -2543,7 +2547,8 @@ function pickChannels(currentImage){
 function correctChannels(dir1, dirOut, channelsList){
 	
 	list  = getFileList(dir1);
-	setBatchMode(true);
+	//setBatchMode(true);
+	setBatchMode(false);
 
 	for (i = 0; i < list.length; i++) {
 		print("i" + i + ":" + list[i]);
@@ -2576,6 +2581,24 @@ function correctChannels(dir1, dirOut, channelsList){
 		redChannel = channelsList[0];
 		greenChannel = channelsList[1];
 		blueChannel = channelsList[2];
+		
+		//select each channel and convert it to 8-bit
+		selectWindow("C"+redChannel+"-"+title);
+		run("8-bit");
+		run("Red");
+    	setMinAndMax(0, 255);
+		
+		selectWindow("C"+greenChannel+"-"+title);
+		run("8-bit");
+		run("Green");
+    	setMinAndMax(0, 255);
+		
+		selectWindow("C"+blueChannel+"-"+title);
+		run("8-bit");
+		run("Blue");
+    	setMinAndMax(0, 255);
+		
+		
 		//Going to do the merging in a separate function 
 		if(redChannel > 0 && greenChannel > 0 && blueChannel > 0){
 			//TODO: maybe merge does not work with stacks??

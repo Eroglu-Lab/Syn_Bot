@@ -34,7 +34,7 @@ for (i = 0; i < list1.length; i++) {
 	
 	run("Convert to Mask");
 	run("Create Selection");
-	run("Restore Selection");
+	//run("Restore Selection");
 	
 	//clear the parts of the red and green channels that are outside of the mask
 	selectImage(currentTitle + " (red)");
