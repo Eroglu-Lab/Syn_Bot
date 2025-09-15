@@ -6,6 +6,13 @@ dir3  = getDirectory("Choose Green Directory ");
 list  = getFileList(dir1);
 setBatchMode(true);
 
+Dialog.create("Choose number of stacks to project");
+Dialog.addNumber("number of stacks per projection:", 3);
+Dialog.show();
+
+numStacks = Dialog.getNumber();
+//print(numStacks);
+
 for (i = 0; i < list.length; i++) {
 	print(list[i]);
 	open(dir1 + list[i]);
@@ -15,11 +22,11 @@ for (i = 0; i < list.length; i++) {
 	if (slices > 1){
 		run("RGB Color", "slices keep");
 		title2 = getTitle();
-		num = floor(slices / 3);
+		num = floor(slices / numStacks);
 	for (j = 1; j <= num; j++) {
-		end = j * 3;
-		start = end - 2;
-		run("Z Project...", "start=" + j + " stop=" + end + " projection=[Max Intensity]");
+		end = j * numStacks;
+		start = end - (numStacks - 1);
+		run("Z Project...", "start=" + start + " stop=" + end + " projection=[Max Intensity]");
 		run("Split Channels");
 		selectWindow("MAX_" + title2 + " (red)");
 		saveAs("Tiff", dir2 + title + " (red)_"+ j +".tif");
