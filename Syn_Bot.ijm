@@ -48,6 +48,10 @@
 //adding shape descriptors to measure circularity
 run("Set Measurements...", "area mean standard centroid center bounding shape integrated display redirect=None decimal=3");
 
+//set foreground and background color. These need to be black and white for SynBot to run correctly
+setForegroundColor(255, 255, 255);
+setBackgroundColor(0, 0, 0); 
+
 //Creates a dialog window for the user to input relevant parameters
 Dialog.create("Syn Bot");
 preprocessingList = newArray("Noise Reduction (Recommended)", "Brightness Adjustment (Use with caution)");
