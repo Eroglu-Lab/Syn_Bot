@@ -3,7 +3,7 @@
  *  Justin Savage
  *  Juan Ramirez
  *  Yizhi Wang
- *  1/16/25
+ *  12/15/25
  *  
  *  Depends on ilastik4ij_Syn_Bot plugin
  *  SynQuant functionality depends on the SynQuantExtra plugin
@@ -1096,6 +1096,12 @@ function analyzePuncta(dir1, dir2, currentOffset, redMinPixel, greenMinPixel, bl
 	
 	roiManager("reset");
 	//Analyze green puncta
+	
+	//exit batch mode since if in custom mode since that seems to prevent green channel selection
+	if(roiType == "custom"){
+		setBatchMode("exit and display");
+	}
+	
 	//The subtract background and Gaussian blur filters are applied
 	selectWindow(title + " (green)");
 	if (noiseBool == true){
